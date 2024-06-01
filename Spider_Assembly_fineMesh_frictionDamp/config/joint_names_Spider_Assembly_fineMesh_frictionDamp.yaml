@@ -1,0 +1,1 @@
+controller_joint_names: ['', 'base_to_coxa1', 'coxa1_to_femur1', 'femur1_to_tibia1', 'base_to_coxa2', 'coxa2_to_femur2', 'femur2_to_tibia2', 'base_to_coxa3', 'coxa3_to_femur3', 'femur3_to_tibia3', 'base_to_coxa4', 'coxa4_to_femur4', 'femur4_to_tibia4', 'base_to_coxa5', 'coxa5_to_femur5', 'femur5_to_tibia5', 'base_to_coxa6', 'coxa6_to_femur6', 'femur6_to_tibia6', ]
