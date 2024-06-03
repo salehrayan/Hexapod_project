@@ -99,8 +99,8 @@
     <limit
       lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -158,10 +158,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-1.5708"
-      upper="2.0944"
-      effort="10"
-      velocity="10" />
+      lower="-1.0472"
+      upper="1.0472"
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -219,10 +219,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-2.0944"
+      lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -282,8 +282,8 @@
     <limit
       lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -341,10 +341,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-1.5708"
-      upper="2.0944"
-      effort="10"
-      velocity="10" />
+      lower="-1.0472"
+      upper="1.0472"
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -402,10 +402,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-2.0944"
+      lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -465,8 +465,8 @@
     <limit
       lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -524,10 +524,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-1.5708"
-      upper="2.0944"
-      effort="10"
-      velocity="10" />
+      lower="-1.0472"
+      upper="1.0472"
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -585,10 +585,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-2.0944"
+      lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -648,8 +648,8 @@
     <limit
       lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -707,10 +707,10 @@
     <axis
       xyz="0.9995 0.0315 0" />
     <limit
-      lower="-1.5708"
-      upper="2.0944"
-      effort="10"
-      velocity="10" />
+      lower="-1.0472"
+      upper="1.0472"
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -768,10 +768,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-2.0944"
+      lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -831,8 +831,8 @@
     <limit
       lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -890,10 +890,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-1.5708"
-      upper="2.0944"
-      effort="10"
-      velocity="10" />
+      lower="-1.0472"
+      upper="1.0472"
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -951,10 +951,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-2.0944"
+      lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -1014,8 +1014,8 @@
     <limit
       lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -1073,10 +1073,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-1.5708"
-      upper="2.0944"
-      effort="10"
-      velocity="10" />
+      lower="-1.0472"
+      upper="1.0472"
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />
@@ -1134,10 +1134,10 @@
     <axis
       xyz="1 0 0" />
     <limit
-      lower="-2.0944"
+      lower="-1.0472"
       upper="1.0472"
-      effort="10"
-      velocity="10" />
+      effort="0.95"
+      velocity="6" />
     <dynamics
       damping="0.05"
       friction="0.25" />

@@ -1,3 +1,5 @@
+import time
+
 import pybullet_data
 import pybullet as p
 from pybullet_utils import bullet_client
@@ -9,20 +11,21 @@ from utils import *
 
 hexapod_urdf_path = r'C:\Users\ASUS\Desktop\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
 
+# Client and plane
 client = bullet_client.BulletClient(connection_mode=p.GUI)
-
-
 client.setAdditionalSearchPath(pybullet_data.getDataPath())
 client.setGravity(0, 0, -9.81)
 plane = client.loadURDF('plane.urdf')
 client.changeDynamics(plane, -1, lateralFriction=0.9)
 
+# Camera position set
 camera_target_position = [0.0, 0.0, 0.0]
 camera_distance = 1.0
 camera_yaw = 64.0
 camera_pitch = -44.2
 client.resetDebugVisualizerCamera(camera_distance, camera_yaw, camera_pitch, camera_target_position)
 
+# Hexapod loading and coloring and self_colision
 flags = client.URDF_USE_SELF_COLLISION
 hexapod = client.loadURDF(hexapod_urdf_path,
                           [0, 0, 0.23], flags=flags)
@@ -34,6 +37,7 @@ for i, color in enumerate(hexapod_right_colors):
     client.changeVisualShape(hexapod, i-1, rgbaColor=color)
 
 
+# Adding userDebugParameters for all joints
 num_joints = client.getNumJoints(hexapod)
 joint_param_ids = {}
 
@@ -46,19 +50,25 @@ for joint_index in range(num_joints):
 
     joint_param_ids[joint_index] = client.addUserDebugParameter(joint_name, joint_range[0], joint_range[1], 0)
 
+# Real-time simulation
 p.setRealTimeSimulation(1)
 while 1:
 
     a = client.getLinkState(hexapod, 0)
     b = client.getEulerFromQuaternion(a[5]) # Roll, pitch, yaw of base
-    cal_angle = np.rad2deg(np.sqrt(b[0]**2 + b[1]**2))
+    cal_angle = np.rad2deg(np.sqrt(b[0]**2 + b[1]**2)) # Angle of the base
+    contact_points = client.getContactPoints(hexapod, plane, 0) # Hexapod base with plane contact points
     client.addUserDebugText(f'base Orientation: {b[0]:.4f}, {b[1]:.4f}, {b[2]:.4f}, cal_angle: {cal_angle:.4f}',
                             [0, 0, 0.3], lifeTime=0.5)
+    client.addUserDebugText(f'Contact points: {contact_points}',
+                            [0, 0, 0.2], lifeTime=0.5)
 
     for joint_index in range(num_joints):
-        # joint_param_value = client.readUserDebugParameter(joint_param_ids[joint_index])
-        joint_param_value = np.random.rand(1) *2 -1
-        client.setJointMotorControl2(hexapod, joint_index, client.POSITION_CONTROL, targetPosition=joint_param_value)
+        joint_param_value = client.readUserDebugParameter(joint_param_ids[joint_index])
+        # joint_param_value = np.random.rand(1) *2 -1
+        client.setJointMotorControl2(hexapod, joint_index, client.POSITION_CONTROL, targetPosition=joint_param_value,
+                                     force=1, maxVelocity=6.15)
+
 
 
 
