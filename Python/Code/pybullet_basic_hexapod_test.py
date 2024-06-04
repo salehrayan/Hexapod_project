@@ -1,5 +1,3 @@
-import time
-
 import pybullet_data
 import pybullet as p
 from pybullet_utils import bullet_client
@@ -51,7 +49,7 @@ for joint_index in range(num_joints):
     joint_param_ids[joint_index] = client.addUserDebugParameter(joint_name, joint_range[0], joint_range[1], 0)
 
 # Real-time simulation
-p.setRealTimeSimulation(1)
+client.setRealTimeSimulation(1)
 while 1:
 
     a = client.getLinkState(hexapod, 0)
