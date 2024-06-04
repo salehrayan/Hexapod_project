@@ -1,5 +1,14 @@
 import xml.etree.ElementTree as ET
-
+import numpy as np
+import pybullet_data
+import pybullet as p
+import cv2
+from time import sleep
+from pybullet_utils import bullet_client
+from stable_baselines3.common.callbacks import BaseCallback
+import os
+import moviepy.editor as mpy
+import imageio
 
 
 def parse_urdf_for_colors(urdf_path):
@@ -25,7 +34,100 @@ def parse_urdf_for_colors(urdf_path):
 
 
 
+def get_hexapod_image(client, hexapod):
+    camera_target_position, _ = client.getBasePositionAndOrientation(hexapod)
+    camera_distance = 2.0
+    camera_yaw = 0.
+    camera_pitch = -44.2
+    camera_roll = 0
+    up_axis_index = 2
 
+    view_matrix = client.computeViewMatrixFromYawPitchRoll(
+        cameraTargetPosition=camera_target_position,
+        distance=camera_distance,
+        yaw=camera_yaw,
+        pitch=camera_pitch,
+        roll=camera_roll,
+        upAxisIndex=up_axis_index
+    )
+    proj_matrix = client.computeProjectionMatrixFOV(60, 1, 0.1, 100)
+    _, _, px, _, _ = client.getCameraImage(512, 512, view_matrix, proj_matrix)
+    rgb_array = np.array(px, dtype=np.uint8).reshape((512, 512, 4))
+    rgb_array = rgb_array[:, :, :3]
+    return rgb_array
+
+
+class VideoRecorderCallback(BaseCallback):
+    """
+    Custom callback for recording a video of the agent during training.
+
+    :param save_path: (str) Path to save the video
+    :param video_length: (int) Length of recorded video
+    :param record_freq: (int) Frequency (in steps) at which to record videos
+    :param verbose: (int) Verbosity level: 0 for no output, 1 for info messages
+    """
+
+    def __init__(self, save_path, video_length=500, record_freq=15000, verbose=0):
+        super(VideoRecorderCallback, self).__init__(verbose)
+        self.save_path = save_path
+        self.video_length = video_length
+        self.record_freq = record_freq
+        self.frames = []
+        self.recording = False
+
+    def _on_step(self) -> bool:
+        if self.num_timesteps % self.record_freq == 0:
+            self.recording = True
+            self.frames = []
+
+        if self.recording:
+            frame = self.training_env.render(mode='rgb_array')
+            self.frames.append(frame)
+
+            if len(self.frames) >= self.video_length:
+                video_path = os.path.join(self.save_path, f"HexapodV0_TRPO-step-{self.num_timesteps}.mp4")
+                clip = mpy.ImageSequenceClip(self.frames, fps=30)
+                clip.write_videofile(video_path, codec='libx264')
+                self.frames = []
+                self.recording = False
+
+        return True
+
+
+class GifRecorderCallback(BaseCallback):
+    """
+    Custom callback for recording a GIF of the agent during training.
+
+    :param save_path: (str) Path to save the GIF
+    :param gif_length: (int) Length of recorded GIF in frames
+    :param record_freq: (int) Frequency (in steps) at which to record GIFs
+    :param verbose: (int) Verbosity level: 0 for no output, 1 for info messages
+    """
+
+    def __init__(self, save_path, gif_length=500, record_freq=15000, verbose=0):
+        super(GifRecorderCallback, self).__init__(verbose)
+        self.save_path = save_path
+        self.gif_length = gif_length
+        self.record_freq = record_freq
+        self.frames = []
+        self.recording = False
+
+    def _on_step(self) -> bool:
+        if self.num_timesteps % self.record_freq == 0:
+            self.recording = True
+            self.frames = []
+
+        if self.recording:
+            frame = self.training_env.render(mode='rgb_array')
+            self.frames.append(frame)
+
+            if len(self.frames) >= self.gif_length:
+                gif_path = os.path.join(self.save_path, f"HexapodV0_TRPO-step-{self.num_timesteps}.gif")
+                imageio.mimsave(gif_path, self.frames, fps=30)
+                self.frames = []
+                self.recording = False
+
+        return True
 
 
 
