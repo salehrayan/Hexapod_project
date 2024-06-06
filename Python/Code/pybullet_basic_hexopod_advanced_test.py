@@ -86,7 +86,7 @@ while 1:
             actions.append(joint_param_value)
             # joint_param_value = np.random.rand(1) *2 -1
         client.setJointMotorControlMultiDofArray(hexapod, range(num_joints), client.POSITION_CONTROL, targetPositions=np.array(actions).reshape(-1,1),
-                                     forces=[[1.]]*18, maxVelocities=[[6.15]]*18)
+                                     forces=[[1.1]]*18, maxVelocities=[[7.48]]*18)
         hexapodBasePosition = hexopodBaseState[4]
         start = time.time()
     # a = [[0]] * 18

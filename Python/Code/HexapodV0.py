@@ -8,18 +8,22 @@ import gymnasium as gym
 from gymnasium import spaces
 from stable_baselines3.common.env_checker import check_env
 from sb3_contrib import TRPO
-from stable_baselines3.common.callbacks import StopTrainingOnNoModelImprovement, EvalCallback
+from stable_baselines3.common.callbacks import StopTrainingOnNoModelImprovement, EvalCallback, CallbackList
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, VecNormalize, VecTransposeImage, VecEnv
 from stable_baselines3.common.monitor import Monitor
 
-"""Hexapod maximized velocity in direction +x while lowering power usage"""
-
+"""Hexapod maximizing velocity in direction +x while lowering power usage.
+Here added base roll and pitch and the base angular velocities of the base along these axes
+and removed cal_angle from the observations
+"""
+max_base_angle_deg = 35.
+max_base_angle_rad = np.deg2rad(max_base_angle_deg)
 
 class HexapodV0(gym.Env):
     metadata = {"render_modes": ["rgb_array"], "render_fps": 20}
 
-    def __init__(self, max_steps=1000, response_time=0.05, render_mode = 'rgb_array'):
+    def __init__(self, max_steps=1000, response_time=0.01, render_mode = 'rgb_array'):
         super().__init__()
 
         self.hexapod_urdf_path = r'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Spider_Assembly_fineMesh_frictionDamp/urdf/Spider_Assembly_fineMesh_frictionDamp.urdf'
@@ -41,12 +45,15 @@ class HexapodV0(gym.Env):
         self.num_joints = self.client.getNumJoints(self.hexapod)
 
         self.render_mode = render_mode
-        low_obs = np.array([0] + [-1.0471] * 18, dtype=np.float32)
-        high_obs = np.array([30] + [1.0471] * 18, dtype=np.float32)
+
+        low_obs = np.array([-10, -10] + [-3.14, -1.57] + [-1.0471] * 18, dtype=np.float32)
+        high_obs = np.array([10, 10] + [3.14, 1.57] + [1.0471] * 18, dtype=np.float32)
         self.observation_space = spaces.Box(low=low_obs, high=high_obs, dtype=np.float32)
+
         low_act = np.array([-1.0471] * 18, dtype=np.float32)
         high_act = np.array([1.0471] * 18, dtype=np.float32)
         self.action_space = spaces.Box(low=low_act, high=high_act, dtype=np.float32)
+
         self.max_steps = max_steps
         self.n_step = 0
 
@@ -58,15 +65,16 @@ class HexapodV0(gym.Env):
                                                     self.baseStartingOrientation)
 
         self.client.resetJointStatesMultiDof(self.hexapod, range(self.num_joints), [[0]]*18, [[0]] * 18)
-        self.hexopodFirstBaseState = self.client.getLinkState(self.hexapod, 0)
+        self.hexopodFirstBaseState = self.client.getLinkState(self.hexapod, 0, computeLinkVelocity=1)
         joint_states = self.client.getJointStates(self.hexapod, range(self.num_joints))
 
-        base_orientation = self.client.getEulerFromQuaternion(self.hexopodFirstBaseState[5])  # Roll, pitch, yaw of base
-        cal_angle = np.rad2deg(np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2))
+        base_orientation = np.array(self.client.getEulerFromQuaternion(self.hexopodFirstBaseState[5]))[0:2]  # Roll and pitch of base
+        # cal_angle = np.rad2deg(np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2))
+        base_angular_vels = np.array(self.hexopodFirstBaseState[6][0:2]) # Roll and pitch velocities
 
         self.n_step = 0
         motor_angles = np.array(next(zip(*joint_states)), dtype=np.float32)
-        observation = np.append(cal_angle, motor_angles)
+        observation = np.append(base_angular_vels, base_orientation, motor_angles)
 
         info = {}
         self.hexapod_previous_position_x = np.copy(self.hexopodFirstBaseState[4][0])
@@ -86,27 +94,29 @@ class HexapodV0(gym.Env):
             sim_timeKeeper += 1./240.
 
         joint_states = self.client.getJointStates(self.hexapod, range(self.num_joints))
-        hexapod_base_state = self.client.getLinkState(self.hexapod, 0)
-        base_orientation = self.client.getEulerFromQuaternion(hexapod_base_state[5])  # Roll, pitch, yaw of base
-        cal_angle = np.rad2deg(np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2))
+        hexapod_base_state = self.client.getLinkState(self.hexapod, 0, computeLinkVelocity=1)
+        base_orientation = self.client.getEulerFromQuaternion(hexapod_base_state[5])[0:2]  # Roll and pitch  of base
+        cal_angle = np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2)
+
+        base_angular_vels = np.array(hexapod_base_state[6][0:2])  # Roll and pitch velocities
 
         motor_angles = np.array(next(zip(*joint_states)), dtype=np.float32)
-        observation = np.append(cal_angle, motor_angles)
+        observation = np.append(base_angular_vels, base_orientation, motor_angles)
 
         self.n_step += 1
 
         truncated = self.n_step == self.max_steps
-        terminated = cal_angle > 28.
+        terminated = cal_angle > max_base_angle_rad
 
         # Reward
-        power_coef = 0.008
+        power_coef = 0.001
         motor_velocities = np.array(list(zip(*joint_states))[1], dtype=np.float32)
         motor_torques = np.array(list(zip(*joint_states))[3], dtype=np.float32)
-        power_term = power_coef * np.mean(motor_velocities * motor_torques)
+        power_term = np.mean(motor_velocities * motor_torques)
         distance = hexapod_base_state[4][0] - self.hexapod_previous_position_x
         self.hexapod_previous_position_x = hexapod_base_state[4][0]
 
-        reward = distance - power_term
+        reward = distance - power_coef * power_term
 
         info = {}
 
@@ -120,7 +130,7 @@ class HexapodV0(gym.Env):
         self.client.disconnect()
 
 
-dir_path = 'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Python/Code/HexapodV0_TRPO_Results/'
+dir_path = 'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Python/Code/HexapodV0_PPO_Results/'
 
 env = HexapodV0(max_steps=1000)
 eval_env = HexapodV0(max_steps=1000)
@@ -134,14 +144,18 @@ eval_vec_env = DummyVecEnv([lambda: eval_env])
 
 new_logger = configure(dir_path, ["csv", "tensorboard"])
 
-# stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=3, min_evals=2, verbose=1)
-eval_callback = EvalCallback(eval_vec_env, eval_freq=10000,
-                             best_model_save_path=dir_path, verbose=1)
+# gifRecorder_callback = GifRecorderCallback(save_path=dir_path, gif_length=400, record_freq=25000)
+# # stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=3, min_evals=2, verbose=1)
+# eval_callback = EvalCallback(eval_vec_env, eval_freq=25000,
+#                              best_model_save_path=dir_path, verbose=1)
 
-model = TRPO('MlpPolicy', vec_env, device='cpu', verbose=1)
+callback = EvalAndRecordGifCallback(eval_env, eval_freq=25000, save_path=dir_path, gif_length=400, record_freq=25000,
+                                    verbose=1)
+
+model = PPO('MlpPolicy', vec_env, device='cpu', verbose=1)
 model.set_logger(new_logger)
 
-model.learn(total_timesteps=1_000_000, progress_bar=True, callback=eval_callback)
+model.learn(total_timesteps=1_000_000, progress_bar=True, callback=callback)
 
 
 
