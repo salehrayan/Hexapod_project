@@ -5,7 +5,8 @@ import pybullet as p
 import cv2
 from time import sleep
 from pybullet_utils import bullet_client
-from stable_baselines3.common.callbacks import BaseCallback
+from stable_baselines3.common.vec_env import VecEnv
+from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 import os
 import moviepy.editor as mpy
 import imageio
@@ -111,7 +112,7 @@ class GifRecorderCallback(BaseCallback):
         self.record_freq = record_freq
         self.frames = []
         self.recording = False
-        self.eval_reward = None
+        self.last_eval_reward = None
 
     def _on_step(self) -> bool:
         if self.num_timesteps % self.record_freq == 0:
@@ -119,40 +120,33 @@ class GifRecorderCallback(BaseCallback):
             self.frames = []
 
         if self.recording:
-            frame = self.training_env.render(mode='rgb_array')
+            # Render the first environment in the VecEnv
+            frame = self.training_env.envs[0].render()
             self.frames.append(frame)
 
             if len(self.frames) >= self.gif_length:
-                reward_str = f"reward-{self.eval_reward:.2f}" if self.eval_reward is not None else "reward-unknown"
-                gif_path = os.path.join(self.save_path, f"HexapodV0_step-{self.num_timesteps}_{reward_str}.gif")
+                reward_info = f"{self.last_eval_reward}" if self.last_eval_reward is not None else "NoReward"
+                gif_path = os.path.join(self.save_path, f"HexapodV0_step-{self.num_timesteps}_reward-{reward_info}.gif")
                 imageio.mimsave(gif_path, self.frames, fps=30)
                 self.frames = []
                 self.recording = False
 
         return True
 
+    def update_last_eval_reward(self, reward):
+        self.last_eval_reward = reward
 
-class EvalAndRecordGifCallback(BaseCallback):
-    """
-    Custom callback that combines evaluation and GIF recording.
 
-    :param eval_env: (gym.Env) Evaluation environment
-    :param eval_freq: (int) Frequency of evaluation
-    :param save_path: (str) Path to save the best model and GIFs
-    :param gif_length: (int) Length of recorded GIF in frames
-    :param record_freq: (int) Frequency (in steps) at which to record GIFs
-    :param verbose: (int) Verbosity level: 0 for no output, 1 for info messages
-    """
-
-    def __init__(self, eval_env, eval_freq, save_path, gif_length=500, record_freq=15000, verbose=0):
-        super(CustomCallback, self).__init__(verbose)
-        self.eval_callback = EvalCallback(eval_env, eval_freq=eval_freq,
-                                          best_model_save_path=save_path, verbose=verbose)
-        self.gif_recorder_callback = GifRecorderCallback(save_path, gif_length, record_freq, verbose)
+class EvalAndRecordGifCallback(EvalCallback):
+    def __init__(self, gif_recorder_callback, *args, **kwargs):
+        super(EvalAndRecordGifCallback, self).__init__(*args, **kwargs)
+        self.gif_recorder_callback = gif_recorder_callback
 
     def _on_step(self) -> bool:
-        eval_result = self.eval_callback._on_step()
-        if self.eval_callback.n_calls % self.eval_callback.eval_freq == 0:
-            self.gif_recorder_callback.eval_reward = self.eval_callback.last_mean_reward
-        gif_result = self.gif_recorder_callback._on_step()
-        return eval_result and gif_result
+        result = super(EvalAndRecordGifCallback, self)._on_step()
+        if result:
+            self.gif_recorder_callback.update_last_eval_reward(self.last_mean_reward)
+        return result
+
+
+

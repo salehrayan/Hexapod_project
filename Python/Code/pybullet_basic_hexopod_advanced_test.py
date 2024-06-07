@@ -44,6 +44,9 @@ joint_param_ids = {}
 for joint_index in range(num_joints):
     joint_info = client.getJointInfo(hexapod, joint_index)
     joint_name = joint_info[1].decode('utf-8')
+    for i in range(1,7):
+        if joint_name == f'base_to_coxa{i}':
+            print(f'{joint_index}, base_to_coxa{i}')
     joint_range = joint_info[8:10]  # (lower limit, upper limit)
     if joint_range[0] == joint_range[1]:  # Default range
         joint_range = (-3.14, 3.14)
@@ -61,6 +64,7 @@ client.setRealTimeSimulation(1)
 start = time.time()
 while 1:
     hexapod_position, _ = client.getBasePositionAndOrientation(hexapod)
+    print(f'hexapod_base_height: {hexapod_position[2]}')
     client.resetDebugVisualizerCamera(camera_distance, camera_yaw, camera_pitch, hexapod_position)
     hexopodBaseState = client.getLinkState(hexapod, 0)
     base_orientation = client.getEulerFromQuaternion(hexopodBaseState[5]) # Roll, pitch, yaw of base
@@ -72,7 +76,7 @@ while 1:
     coxa1_to_femur1_velocity = client.getJointState(hexapod, 1)[1]
     coxa1_to_femur1_torque = client.getJointState(hexapod, 1)[3]
     client.addUserDebugText(f'coxa1_to_femur1 angular Velocity: {coxa1_to_femur1_velocity:.4f},'
-                            f' coxa1_to_femur1 Energy: {coxa1_to_femur1_velocity * coxa1_to_femur1_torque:.4f}', [-0.3, 0, 0.3],
+                            f' coxa1_to_femur1 Energy: {coxa1_to_femur1_velocity * coxa1_to_femur1_torque * response_time:.4f}', [-0.3, 0, 0.3],
                             lifeTime=0.1)
 
 
