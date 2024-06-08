@@ -5,20 +5,19 @@ import numpy as np
 from time import sleep
 from utils import *
 import gymnasium as gym
+import math
 from gymnasium import spaces
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import StopTrainingOnNoModelImprovement, EvalCallback, CallbackList
 from stable_baselines3.common.logger import configure
-from stable_baselines3.common.vec_env import (DummyVecEnv, VecVideoRecorder,
-                                              VecNormalize, VecTransposeImage, VecEnv, VecFrameStack)
+from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, VecNormalize, VecTransposeImage, VecEnv
 from stable_baselines3.common.monitor import Monitor
 
 """Hexapod maximizing velocity in direction +x while lowering power usage.
-removed cal_angle from the observations
+base_angle removed
+added HER
 more envs
-
-observations: coxa_angles, whether tibias hit the ground
 """
 max_base_angle_deg = 40.
 max_base_angle_rad = np.deg2rad(max_base_angle_deg)
@@ -35,8 +34,8 @@ class HexapodV0(gym.Env):
         self.client = bullet_client.BulletClient(connection_mode=p.DIRECT)
         self.client.setAdditionalSearchPath(pybullet_data.getDataPath())
         self.client.setGravity(0, 0, -9.81)
-        self.plane = self.client.loadURDF('plane.urdf')
-        self.client.changeDynamics(self.plane, -1, lateralFriction=0.9)
+        plane = self.client.loadURDF('plane.urdf')
+        self.client.changeDynamics(plane, -1, lateralFriction=0.9)
 
         flags = self.client.URDF_USE_SELF_COLLISION
         self.hexapod = self.client.loadURDF(self.hexapod_urdf_path,
@@ -49,8 +48,8 @@ class HexapodV0(gym.Env):
 
         self.render_mode = render_mode
 
-        low_obs = np.array([-1.0471] * 6 + [-1] * 6, dtype=np.float32)
-        high_obs = np.array([1.0471] * 6 + [2] * 6, dtype=np.float32)
+        low_obs = np.array([-1.0471] * 18, dtype=np.float32)
+        high_obs = np.array( [1.0471] * 18, dtype=np.float32)
         self.observation_space = spaces.Box(low=low_obs, high=high_obs, dtype=np.float32)
 
         low_act = np.array([-1.0471] * 18, dtype=np.float32)
@@ -68,22 +67,20 @@ class HexapodV0(gym.Env):
                                                     self.baseStartingOrientation)
 
         self.client.resetJointStatesMultiDof(self.hexapod, range(self.num_joints), [[0]]*18, [[0]] * 18)
-        self.hexopodFirstBaseState = self.client.getLinkState(self.hexapod, 0, computeLinkVelocity=1)
-        joint_states = self.client.getJointStates(self.hexapod, range(0, 16, 3))
+        self.hexopodFirstBasePosition, self.hexopodFirstBaseOrientation = self.client.getBasePositionAndOrientation(self.hexapod)
+        # _, self.hexopodFirstBaseVel =self.client.getBaseVelocity(self.hexapod)
+        joint_states = self.client.getJointStates(self.hexapod, range(self.num_joints))
 
-        # base_orientation = np.array(self.client.getEulerFromQuaternion(self.hexopodFirstBaseState[5]))[0:2]  # Roll and pitch of base
-        # cal_angle = np.rad2deg(np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2))
-        # base_angular_vels = np.array(self.hexopodFirstBaseState[6][0:2]) # Roll and pitch velocities
+        # base_orientation = np.array(self.client.getEulerFromQuaternion(self.hexopodFirstBaseOrientation))[0:2]  # Roll and pitch of base
+        # base_angle = np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2).reshape(1)
+        # base_angular_vels = np.array(self.hexopodFirstBaseVel[0:2]) # Roll and pitch velocities
 
         self.n_step = 0
         motor_angles = np.array(next(zip(*joint_states)), dtype=np.float32)
+        observation = motor_angles
 
-        tibias_collision = []
-        for i in range(2, 18, 3):
-            tibias_collision.append(len(self.client.getContactPoints(self.hexapod, self.plane, i)) > 0)
-        observation = np.append(motor_angles, np.array(tibias_collision))
         info = {}
-        self.hexapod_previous_position_x = np.copy(self.hexopodFirstBaseState[4][0])
+        self.hexapod_previous_position_x = np.copy(self.hexopodFirstBasePosition[0])
 
         return observation, info
 
@@ -99,32 +96,29 @@ class HexapodV0(gym.Env):
             self.client.stepSimulation()
             sim_timeKeeper += 1./240.
 
-        joint_states = self.client.getJointStates(self.hexapod, range(0,16,3))
-        hexapod_base_state = self.client.getLinkState(self.hexapod, 0, computeLinkVelocity=1)
-        base_orientation = self.client.getEulerFromQuaternion(hexapod_base_state[5])[0:2]  # Roll and pitch  of base
-        cal_angle = np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2)
+        joint_states = self.client.getJointStates(self.hexapod, range(self.num_joints))
+        hexapod_base_position, hexapod_base_position = self.client.getBasePositionAndOrientation(self.hexapod)
+        # hexapod_base_vel = self.client.getBaseVelocity(self.hexapod)
+        base_orientation = self.client.getEulerFromQuaternion(hexapod_base_position)[0:2]  # Roll and pitch  of base
+        base_angle = np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2).reshape(1)
 
-        base_angular_vels = np.array(hexapod_base_state[6][0:2])  # Roll and pitch velocities
+        # base_angular_vels = np.array(hexapod_base_vel[0:2])  # Roll and pitch velocities
 
         motor_angles = np.array(next(zip(*joint_states)), dtype=np.float32)
-        tibias_collision = []
-        for i in range(2, 18, 3):
-            tibias_collision.append(len(self.client.getContactPoints(self.hexapod, self.plane, i)) > 0)
-        observation = np.append(motor_angles, np.array(tibias_collision))
-
+        observation = motor_angles
 
         self.n_step += 1
 
         truncated = self.n_step == self.max_steps
-        terminated = cal_angle > max_base_angle_rad
+        terminated = base_angle > max_base_angle_rad
 
         # Reward
-        power_coef = 0.0005
+        power_coef = 0.001
         motor_velocities = np.array(list(zip(*joint_states))[1], dtype=np.float32)
         motor_torques = np.array(list(zip(*joint_states))[3], dtype=np.float32)
         power_term = np.mean(motor_velocities * motor_torques)
-        distance = hexapod_base_state[4][0] - self.hexapod_previous_position_x
-        self.hexapod_previous_position_x = hexapod_base_state[4][0]
+        distance = hexapod_base_position[0] - self.hexapod_previous_position_x
+        self.hexapod_previous_position_x = hexapod_base_position[0]
 
         reward = distance - power_coef * power_term * self.response_time
 
@@ -140,28 +134,31 @@ class HexapodV0(gym.Env):
         self.client.disconnect()
 
 
-dir_path = 'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Python/Code/HexapodV0.1_PPO_Results/'
+dir_path = 'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Python/Code/HexapodV0_PPO_Results/'
 
-num_envs = 4
+num_envs = 2
+
+eval_env = HexapodV0(max_steps=1000)
 
 def create_hexapod_env():
-    return HexapodV0(max_steps=1000)
+    return Monitor(HexapodV0(max_steps=1000))
 
+env_fns = [create_hexapod_env for _ in range(num_envs)]
 
-vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=2), norm_obs=False)
-vec_env = VecFrameStack(vec_env, n_stack=2)
+vec_env = VecNormalize(DummyVecEnv(env_fns), norm_obs=False)
 
-eval_vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=1), norm_obs=False, norm_reward=False)
-eval_vec_env = VecFrameStack(eval_vec_env, n_stack=2)
+eval_env = Monitor(eval_env)
+eval_vec_env = VecNormalize(DummyVecEnv([lambda: eval_env]), norm_obs=False, norm_reward=False)
+
 
 new_logger = configure(dir_path, ["csv", "tensorboard"])
 
-gifRecorder_callback = GifRecorderCallback(save_path=dir_path, gif_length=400, record_freq=25000 * num_envs)
+gifRecorder_callback = GifRecorderCallback(save_path=dir_path, gif_length=10, record_freq=25 * num_envs)
 # # stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=3, min_evals=2, verbose=1)
 # eval_callback = EvalCallback(eval_vec_env, eval_freq=25000,
 #                              best_model_save_path=dir_path, verbose=1)
 
-custom_callback = EvalAndRecordGifCallback(gifRecorder_callback, eval_env=eval_vec_env, eval_freq=25000,
+custom_callback = EvalAndRecordGifCallback(gifRecorder_callback, eval_env=eval_vec_env, eval_freq=25,
                                           best_model_save_path=dir_path, verbose=1)
 callback_list = CallbackList([custom_callback, gifRecorder_callback])
 

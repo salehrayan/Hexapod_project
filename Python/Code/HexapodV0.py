@@ -11,13 +11,13 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import StopTrainingOnNoModelImprovement, EvalCallback, CallbackList
 from stable_baselines3.common.logger import configure
+from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, VecNormalize, VecTransposeImage, VecEnv
 from stable_baselines3.common.monitor import Monitor
 
 """Hexapod maximizing velocity in direction +x while lowering power usage.
-
 base_angle removed
-4 envs
+more envs
 """
 max_base_angle_deg = 40.
 max_base_angle_rad = np.deg2rad(max_base_angle_deg)
@@ -138,25 +138,20 @@ dir_path = 'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Python/Code/HexapodV0_PP
 
 num_envs = 2
 
-eval_env = HexapodV0(max_steps=1000)
-
 def create_hexapod_env():
-    return Monitor(HexapodV0(max_steps=1000))
+    return HexapodV0(max_steps=1000)
 
-env_fns = [create_hexapod_env for _ in range(num_envs)]
+# env_fns = [create_hexapod_env for _ in range(num_envs)]
 
-vec_env = VecNormalize(DummyVecEnv(env_fns), norm_obs=False)
+vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=2), norm_obs=False)
 
-eval_env = Monitor(eval_env)
-eval_vec_env = VecNormalize(DummyVecEnv([lambda: eval_env]), norm_obs=False, norm_reward=False)
+eval_vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=1), norm_obs=False, norm_reward=False)
 
 
 new_logger = configure(dir_path, ["csv", "tensorboard"])
 
 gifRecorder_callback = GifRecorderCallback(save_path=dir_path, gif_length=10, record_freq=25 * num_envs)
-# # stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=3, min_evals=2, verbose=1)
-# eval_callback = EvalCallback(eval_vec_env, eval_freq=25000,
-#                              best_model_save_path=dir_path, verbose=1)
+
 
 custom_callback = EvalAndRecordGifCallback(gifRecorder_callback, eval_env=eval_vec_env, eval_freq=25,
                                           best_model_save_path=dir_path, verbose=1)

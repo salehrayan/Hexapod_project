@@ -45,8 +45,8 @@ for joint_index in range(num_joints):
     joint_info = client.getJointInfo(hexapod, joint_index)
     joint_name = joint_info[1].decode('utf-8')
     for i in range(1,7):
-        if joint_name == f'base_to_coxa{i}':
-            print(f'{joint_index}, base_to_coxa{i}')
+        if joint_name == f'femur{i}_to_tibia{i}':
+            print(f'{joint_index}, femur{i}_to_tibia{i}')
     joint_range = joint_info[8:10]  # (lower limit, upper limit)
     if joint_range[0] == joint_range[1]:  # Default range
         joint_range = (-3.14, 3.14)
