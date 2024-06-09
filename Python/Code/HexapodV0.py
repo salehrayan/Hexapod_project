@@ -12,12 +12,16 @@ from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import StopTrainingOnNoModelImprovement, EvalCallback, CallbackList
 from stable_baselines3.common.logger import configure
 from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, VecNormalize, VecTransposeImage, VecEnv
+from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, VecNormalize, VecTransposeImage, VecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
 
 """Hexapod maximizing velocity in direction +x while lowering power usage.
-base_angle removed
-more envs
+obs: 18
+action: 18
+
+reward ~ speed - energy
+
+2 or more stacks
 """
 max_base_angle_deg = 30.
 max_base_angle_rad = np.deg2rad(max_base_angle_deg)
@@ -34,8 +38,8 @@ class HexapodV0(gym.Env):
         self.client = bullet_client.BulletClient(connection_mode=p.DIRECT)
         self.client.setAdditionalSearchPath(pybullet_data.getDataPath())
         self.client.setGravity(0, 0, -9.81)
-        plane = self.client.loadURDF('plane.urdf')
-        self.client.changeDynamics(plane, -1, lateralFriction=0.9)
+        self.plane = self.client.loadURDF('plane.urdf')
+        self.client.changeDynamics(self.plane, -1, lateralFriction=0.9)
 
         flags = self.client.URDF_USE_SELF_COLLISION
         self.hexapod = self.client.loadURDF(self.hexapod_urdf_path,

@@ -11,15 +11,19 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.env_checker import check_env
 from stable_baselines3.common.callbacks import StopTrainingOnNoModelImprovement, EvalCallback, CallbackList
 from stable_baselines3.common.logger import configure
-from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, VecNormalize, VecTransposeImage, VecEnv
+from stable_baselines3.common.env_util import make_vec_env
+from stable_baselines3.common.vec_env import DummyVecEnv, VecVideoRecorder, VecNormalize, VecTransposeImage, VecEnv, VecFrameStack
 from stable_baselines3.common.monitor import Monitor
 
-"""Hexapod maximizing velocity in direction +x while lowering power usage.
-base_angle removed
-added HER
-more envs
 """
-max_base_angle_deg = 40.
+obs: 18
+action: 18
+
+reward ~ speed - energy - tibia's tip
+
+2 stack
+"""
+max_base_angle_deg = 30.
 max_base_angle_rad = np.deg2rad(max_base_angle_deg)
 
 class HexapodV0(gym.Env):
@@ -34,8 +38,8 @@ class HexapodV0(gym.Env):
         self.client = bullet_client.BulletClient(connection_mode=p.DIRECT)
         self.client.setAdditionalSearchPath(pybullet_data.getDataPath())
         self.client.setGravity(0, 0, -9.81)
-        plane = self.client.loadURDF('plane.urdf')
-        self.client.changeDynamics(plane, -1, lateralFriction=0.9)
+        self.plane = self.client.loadURDF('plane.urdf')
+        self.client.changeDynamics(self.plane, -1, lateralFriction=0.9)
 
         flags = self.client.URDF_USE_SELF_COLLISION
         self.hexapod = self.client.loadURDF(self.hexapod_urdf_path,
@@ -61,6 +65,8 @@ class HexapodV0(gym.Env):
 
         self.baseStartingOrientation = (1.922480683568466e-06, 3.4529048805755093e-06, -0.000747809233266321, 0.999999720382827)
         self.response_time = response_time
+
+        self.tip_offset = [0, 0, -0.14845021]
 
     def reset(self, seed=None, options=None):
         self.client.resetBasePositionAndOrientation(self.hexapod, [0, 0, 0.23],
@@ -97,9 +103,10 @@ class HexapodV0(gym.Env):
             sim_timeKeeper += 1./240.
 
         joint_states = self.client.getJointStates(self.hexapod, range(self.num_joints))
-        hexapod_base_position, hexapod_base_position = self.client.getBasePositionAndOrientation(self.hexapod)
+        hexapod_base_position, hexapod_base_orientation = self.client.getBasePositionAndOrientation(self.hexapod)
+        hexapod_base_vel = self.client.getBaseVelocity(self.hexapod)
         # hexapod_base_vel = self.client.getBaseVelocity(self.hexapod)
-        base_orientation = self.client.getEulerFromQuaternion(hexapod_base_position)[0:2]  # Roll and pitch  of base
+        base_orientation = self.client.getEulerFromQuaternion(hexapod_base_orientation)[0:2]  # Roll and pitch  of base
         base_angle = np.sqrt(base_orientation[0] ** 2 + base_orientation[1] ** 2).reshape(1)
 
         # base_angular_vels = np.array(hexapod_base_vel[0:2])  # Roll and pitch velocities
@@ -117,10 +124,14 @@ class HexapodV0(gym.Env):
         motor_velocities = np.array(list(zip(*joint_states))[1], dtype=np.float32)
         motor_torques = np.array(list(zip(*joint_states))[3], dtype=np.float32)
         power_term = np.mean(motor_velocities * motor_torques)
-        distance = hexapod_base_position[0] - self.hexapod_previous_position_x
-        self.hexapod_previous_position_x = hexapod_base_position[0]
+        # distance = hexapod_base_position[0] - self.hexapod_previous_position_x
+        velocity = hexapod_base_vel[0][0]
+        # self.hexapod_previous_position_x = hexapod_base_position[0]
+        tibia_reward = get_tibia_contacts_reward(self.client, self.hexapod, self.plane, range(2, 18, 3), self.tip_offset)
+        tibia_reward_coef = 1
 
-        reward = distance - power_coef * power_term * self.response_time
+        reward = (velocity - 1 * (terminated) - power_coef * power_term * self.response_time +
+                  tibia_reward_coef * tibia_reward)
 
         info = {}
 
@@ -134,38 +145,36 @@ class HexapodV0(gym.Env):
         self.client.disconnect()
 
 
-dir_path = 'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Python/Code/HexapodV0_PPO_Results/'
+dir_path = 'C:/Users/ASUS/Desktop/Re-inforcement/Spider/Python/Code/HexapodV0_PPO_2stacked_1tibiaContact_results/'
 
-num_envs = 2
-
-eval_env = HexapodV0(max_steps=1000)
+num_envs = 5
+n_stack = 2
 
 def create_hexapod_env():
-    return Monitor(HexapodV0(max_steps=1000))
+    return HexapodV0(max_steps=1000)
 
-env_fns = [create_hexapod_env for _ in range(num_envs)]
+# env_fns = [create_hexapod_env for _ in range(num_envs)]
 
-vec_env = VecNormalize(DummyVecEnv(env_fns), norm_obs=False)
+vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=num_envs), norm_obs=False)
+vec_env = VecFrameStack(vec_env, n_stack=n_stack)
 
-eval_env = Monitor(eval_env)
-eval_vec_env = VecNormalize(DummyVecEnv([lambda: eval_env]), norm_obs=False, norm_reward=False)
-
+eval_vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=1), norm_obs=False, norm_reward=False)
+eval_vec_env = VecFrameStack(eval_vec_env, n_stack=n_stack)
 
 new_logger = configure(dir_path, ["csv", "tensorboard"])
 
-gifRecorder_callback = GifRecorderCallback(save_path=dir_path, gif_length=10, record_freq=25 * num_envs)
-# # stop_train_callback = StopTrainingOnNoModelImprovement(max_no_improvement_evals=3, min_evals=2, verbose=1)
-# eval_callback = EvalCallback(eval_vec_env, eval_freq=25000,
-#                              best_model_save_path=dir_path, verbose=1)
+gifRecorder_callback = GifRecorderCallback(save_path=dir_path, gif_length=400, record_freq=40_000 * num_envs)
 
-custom_callback = EvalAndRecordGifCallback(gifRecorder_callback, eval_env=eval_vec_env, eval_freq=25,
+
+custom_callback = EvalAndRecordGifCallback(gifRecorder_callback, eval_env=eval_vec_env, eval_freq=40_000,
                                           best_model_save_path=dir_path, verbose=1)
 callback_list = CallbackList([custom_callback, gifRecorder_callback])
 
 model = PPO('MlpPolicy', vec_env, device='cpu', verbose=1)
 model.set_logger(new_logger)
 
-model.learn(total_timesteps=1_000_000, progress_bar=True, callback=callback_list)
+model.learn(total_timesteps=10_000_000, progress_bar=True, callback=callback_list)
+
 
 
 

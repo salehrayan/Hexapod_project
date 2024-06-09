@@ -9,6 +9,7 @@ from stable_baselines3.common.vec_env import VecEnv
 from stable_baselines3.common.callbacks import BaseCallback, EvalCallback
 import os
 import moviepy.editor as mpy
+from scipy.spatial.transform import Rotation as R
 import imageio
 
 
@@ -147,6 +148,51 @@ class EvalAndRecordGifCallback(EvalCallback):
         if result:
             self.gif_recorder_callback.update_last_eval_reward(self.last_mean_reward)
         return result
+
+
+
+# Function to apply the transformation
+def transform_position(position, orientation, offset):
+    # Convert orientation to a rotation matrix
+    rotation = R.from_quat(orientation)
+    rotation_matrix = rotation.as_matrix()
+    # Apply the rotation to the offset
+    rotated_offset = np.dot(rotation_matrix, offset)
+    # Add the rotated offset to the position
+    tip_position = np.add(position, rotated_offset)
+    return tip_position
+
+# Function to get the position of the tip end of each leg
+def get_leg_tip_positions(client, robot_id, leg_end_links, offset):
+    leg_positions = []
+    for leg_end_link in leg_end_links:
+        link_state = client.getLinkState(robot_id, leg_end_link)
+        link_world_position = link_state[4]  # World position of the link
+        link_world_orientation = link_state[5]  # World orientation of the link
+        # Calculate the tip position
+        tip_position = transform_position(link_world_position, link_world_orientation, offset)
+        leg_positions.append(tip_position)
+    return leg_positions
+
+
+# Function to compute the reward for the contact point location of the tibias with the plane
+def get_tibia_contacts_reward(client, hexapod_id, plane_id, tibia_ids, tip_offset):
+
+    tibia_contact_points = np.empty((0, 3))
+    tibia_contacted_ids = [] # Tibias that are contacting the ground
+    for i in tibia_ids:
+        contact_point_tuple = client.getContactPoints(hexapod_id, plane_id, i)
+        if len(contact_point_tuple) > 0:
+            tibia_contact_points = np.concatenate((tibia_contact_points, np.array(contact_point_tuple[0][5]).reshape(-1,3)), axis=0)
+            tibia_contacted_ids.append(i)
+
+    tibia_tip_locations = np.array(get_leg_tip_positions(client, hexapod_id, tibia_contacted_ids, tip_offset)).reshape(-1,3)
+    return -np.nan_to_num(np.sum(np.square(tibia_tip_locations - tibia_contact_points)), nan=0)
+
+
+
+
+
 
 
 

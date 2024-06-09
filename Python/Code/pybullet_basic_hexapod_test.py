@@ -65,7 +65,7 @@ while 1:
         joint_param_value = client.readUserDebugParameter(joint_param_ids[joint_index])
         # joint_param_value = np.random.rand(1) *2 -1
         client.setJointMotorControl2(hexapod, joint_index, client.POSITION_CONTROL, targetPosition=joint_param_value,
-                                     force=1, maxVelocity=6.15)
+                                     force=1.1, maxVelocity=6.15)
 
 
 

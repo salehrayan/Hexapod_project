@@ -6,7 +6,7 @@ import numpy as np
 from time import sleep
 from utils import *
 
-"""Here I calculate the speed of the base, the torque and angular velocities of the joints"""
+"""Here I calculate the speed of the base, the torque and angular velocities of the joints and a lot of other stuff"""
 
 hexapod_urdf_path = r'C:\Users\ASUS\Desktop\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
 
@@ -53,9 +53,9 @@ for joint_index in range(num_joints):
 
     joint_param_ids[joint_index] = client.addUserDebugParameter(joint_name, joint_range[0], joint_range[1], 0)
 
-# hexopodFirstBaseState = client.getLinkState(hexapod, 0)
-# hexapodBasePosition = hexopodFirstBaseState[4]
 
+
+tip_offset = [0, 0, -0.14845021]
 
 
 # Real-time simulation
@@ -64,12 +64,14 @@ client.setRealTimeSimulation(1)
 start = time.time()
 while 1:
     hexapod_position, _ = client.getBasePositionAndOrientation(hexapod)
-    print(f'hexapod_base_height: {hexapod_position[2]}')
-    client.resetDebugVisualizerCamera(camera_distance, camera_yaw, camera_pitch, hexapod_position)
+    # print(f'hexapod_base_height: {hexapod_position[2]}')
+    # client.resetDebugVisualizerCamera(camera_distance, camera_yaw, camera_pitch, hexapod_position)
     hexapodBasePosition , hexopodBaseOrientation = client.getBasePositionAndOrientation(hexapod)
     base_orientation = client.getEulerFromQuaternion(hexopodBaseOrientation) # Roll, pitch, yaw of base
     cal_angle = np.rad2deg(np.sqrt(base_orientation[0]**2 + base_orientation[1]**2)) # Angle of the base
-    contact_points = client.getContactPoints(hexapod, plane, 0) # Hexapod base with plane contact points
+    tibia_1_contact_points = client.getContactPoints(hexapod, plane, 2)
+    tibia_1_state = client.getLinkState(hexapod, 2)
+    tibia_1_position = tibia_1_state[4]
     client.addUserDebugText(f'base Orientation: {base_orientation[0]:.4f}, {base_orientation[1]:.4f}, {base_orientation[2]:.4f}, cal_angle: {cal_angle:.4f}',
                             [0, 0, 0.3], lifeTime=0.5)
 
@@ -79,6 +81,13 @@ while 1:
                             f' coxa1_to_femur1 Energy: {coxa1_to_femur1_velocity * coxa1_to_femur1_torque * response_time:.4f}', [-0.3, 0, 0.3],
                             lifeTime=0.1)
 
+    tibia_tip_locations = get_leg_tip_positions(client, hexapod, range(2, 18, 3), tip_offset)
+    client.addUserDebugPoints(tibia_tip_locations, [[1, 0, 0]] * 6, lifeTime=0.3, pointSize=5)
+
+    # if len(tibia_1_contact_points) > 0:
+    #     print(np.array(tibia_1_contact_points[0][5]) - np.array(tibia_1_position))
+    tibia_reward = get_tibia_contacts_reward(client, hexapod, plane, range(2, 18, 3), tip_offset)
+    print(tibia_reward)
 
     elapsed_time = time.time() - start
     hexapod_base_vel = client.getBaseVelocity(hexapod)
