@@ -14,7 +14,7 @@ from stable_baselines3.common.vec_env import (DummyVecEnv, VecVideoRecorder,
                                               VecNormalize, VecTransposeImage, VecEnv, VecFrameStack)
 from stable_baselines3.common.monitor import Monitor
 
-"""Hexapod maximizing velocity in direction +x while lowering power usage.
+""" Maintenance Mode
 removed cal_angle from the observations
 more envs
 
@@ -68,6 +68,7 @@ class HexapodV0(gym.Env):
                                                     self.baseStartingOrientation)
 
         self.client.resetJointStatesMultiDof(self.hexapod, range(self.num_joints), [[0]]*18, [[0]] * 18)
+        '''FIX ------------'''
         self.hexopodFirstBaseState = self.client.getLinkState(self.hexapod, 0, computeLinkVelocity=1)
         joint_states = self.client.getJointStates(self.hexapod, range(0, 16, 3))
 

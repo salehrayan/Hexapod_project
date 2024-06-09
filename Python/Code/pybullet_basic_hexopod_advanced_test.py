@@ -53,8 +53,8 @@ for joint_index in range(num_joints):
 
     joint_param_ids[joint_index] = client.addUserDebugParameter(joint_name, joint_range[0], joint_range[1], 0)
 
-hexopodFirstBaseState = client.getLinkState(hexapod, 0)
-hexapodBasePosition = hexopodFirstBaseState[4]
+# hexopodFirstBaseState = client.getLinkState(hexapod, 0)
+# hexapodBasePosition = hexopodFirstBaseState[4]
 
 
 
@@ -66,8 +66,8 @@ while 1:
     hexapod_position, _ = client.getBasePositionAndOrientation(hexapod)
     print(f'hexapod_base_height: {hexapod_position[2]}')
     client.resetDebugVisualizerCamera(camera_distance, camera_yaw, camera_pitch, hexapod_position)
-    hexopodBaseState = client.getLinkState(hexapod, 0)
-    base_orientation = client.getEulerFromQuaternion(hexopodBaseState[5]) # Roll, pitch, yaw of base
+    hexapodBasePosition , hexopodBaseOrientation = client.getBasePositionAndOrientation(hexapod)
+    base_orientation = client.getEulerFromQuaternion(hexopodBaseOrientation) # Roll, pitch, yaw of base
     cal_angle = np.rad2deg(np.sqrt(base_orientation[0]**2 + base_orientation[1]**2)) # Angle of the base
     contact_points = client.getContactPoints(hexapod, plane, 0) # Hexapod base with plane contact points
     client.addUserDebugText(f'base Orientation: {base_orientation[0]:.4f}, {base_orientation[1]:.4f}, {base_orientation[2]:.4f}, cal_angle: {cal_angle:.4f}',
@@ -81,8 +81,11 @@ while 1:
 
 
     elapsed_time = time.time() - start
+    hexapod_base_vel = client.getBaseVelocity(hexapod)
     if elapsed_time > response_time:
-        client.addUserDebugText(f'X axis Velocity: {hexopodBaseState[4][0] - hexapodBasePosition[0]}',
+        client.addUserDebugText(f'X axis Velocity: {hexapod_base_vel[0][0]:0.3f}, '
+                                f'X axis Velocity: {hexapod_base_vel[0][1]:0.3f}, '
+                                f'X axis Velocity: {hexapod_base_vel[0][2]:0.3f}',
                                 [0, 0, 0.2], lifeTime=0.1)
         actions = []
         for joint_index in range(num_joints):
@@ -91,7 +94,7 @@ while 1:
             # joint_param_value = np.random.rand(1) *2 -1
         client.setJointMotorControlMultiDofArray(hexapod, range(num_joints), client.POSITION_CONTROL, targetPositions=np.array(actions).reshape(-1,1),
                                      forces=[[1.1]]*18, maxVelocities=[[7.48]]*18)
-        hexapodBasePosition = hexopodBaseState[4]
+        hexapodBasePosition = hexapodBasePosition
         start = time.time()
     # a = [[0]] * 18
     # p.resetJointStatesMultiDof(hexapod, range(num_joints), targetValues=[[0]]*18, targetVelocities=[[0]]*18)
