@@ -15,7 +15,7 @@ client = bullet_client.BulletClient(connection_mode=p.GUI)
 client.setAdditionalSearchPath(pybullet_data.getDataPath())
 client.setGravity(0, 0, -9.81)
 plane = client.loadURDF('plane.urdf')
-client.changeDynamics(plane, -1, lateralFriction=0.9)
+client.changeDynamics(plane, -1, lateralFriction=0.01)
 
 # Camera position set
 camera_target_position = [0.0, 0.0, 0.0]

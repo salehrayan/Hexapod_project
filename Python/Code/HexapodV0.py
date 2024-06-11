@@ -93,7 +93,7 @@ class HexapodV0(gym.Env):
         action.reshape(1, -1)
         self.client.setJointMotorControlMultiDofArray(self.hexapod, range(self.num_joints), self.client.POSITION_CONTROL,
                                                  targetPositions=np.array(action).reshape(-1, 1),
-                                                 forces=[[1.]] * 18, maxVelocities=[[6.15]] * 18)
+                                                 forces=[[1.1]] * 18, maxVelocities=[[7.47]] * 18)
 
         sim_timeKeeper = 0
         while sim_timeKeeper < self.response_time:
