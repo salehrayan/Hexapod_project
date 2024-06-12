@@ -3,7 +3,7 @@ import pybullet as p
 from pybullet_utils import bullet_client
 import numpy as np
 from time import sleep
-from utils import *
+from drive.MyDrive.utils import *
 import gymnasium as gym
 import math
 from gymnasium import spaces
@@ -19,7 +19,7 @@ from stable_baselines3.common.monitor import Monitor
 obs: 3 + 18
 action: 18
 
-reward ~ speed_x/(1 + speed_y * speed_x + speed_x * num_femur_collisions) - energy - tibia's tip - continuityReward
+reward ~ speed_x/(1 + speed_y * speed_x**2 + speed_x**2 * num_femur_collisions) - energy - tibia's tip - observationActContinuityReward
 
 2 stack
 """
@@ -32,7 +32,7 @@ class HexapodV0(gym.Env):
     def __init__(self, max_steps=1000, response_time=0.01, render_mode = 'rgb_array'):
         super().__init__()
 
-        self.hexapod_urdf_path = r'C:\Users\ASUS\Desktop\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
+        self.hexapod_urdf_path = r'/Spider_Assembly_fineMesh_frictionDamp/urdf/Spider_Assembly_fineMesh_frictionDamp.urdf'
 
         # Client and plane
         self.client = bullet_client.BulletClient(connection_mode=p.DIRECT)
@@ -91,7 +91,8 @@ class HexapodV0(gym.Env):
 
         info = {}
         self.hexapod_previous_position_x = np.copy(self.hexopodFirstBasePosition[0])
-        self.prev_action = 0
+        self.prev_obs = 0
+        self.prev_actions = 0
 
         return observation, info
 
@@ -137,14 +138,17 @@ class HexapodV0(gym.Env):
         tibia_reward_coef = 20
         num_femur_collisions = check_femur_collisions(self.client, self.hexapod, range(1, 17, 3))
 
-        continuity_reward = np.sum((action - self.prev_action) ** 2)
+        continuity_reward = np.sum((motor_angles - self.prev_obs) ** 2) + np.sum((action - self.prev_actions) ** 2)
+        # obsContinuity_coef = 0.01
+        # rewContinuity_coef = 0.01
         continuity_coef = 0.001
 
-        reward = (velocity_x/(1 + (abs(velocity_y) + num_femur_collisions) * abs(velocity_x)) -
+        reward = (velocity_x/(1 + (abs(velocity_y) + num_femur_collisions) * abs(velocity_x)**2) -
                   1 * (terminated) - power_coef * power_term * self.response_time +
                   tibia_reward_coef * tibia_reward - continuity_coef * continuity_reward)
 
-        self.prev_action = action
+        self.prev_obs = motor_angles
+        self.prev_actions = action
         info = {}
 
         return observation, reward, terminated, truncated, info
@@ -157,7 +161,8 @@ class HexapodV0(gym.Env):
         self.client.disconnect()
 
 
-dir_path = 'HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_continuityReward_results'
+dir_path = 'HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_obsActContinuityReward_results'
+
 
 num_envs = 5
 n_stack = 2
@@ -168,6 +173,9 @@ def create_hexapod_env():
 # env_fns = [create_hexapod_env for _ in range(num_envs)]
 
 vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=num_envs), norm_obs=False)
+# vec_env = VecNormalize.load('/content/drive/MyDrive/HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_results/HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_results_vecnormalize_3400000_steps.pkl',
+                            # make_vec_env(create_hexapod_env, n_envs=num_envs))
+
 vec_env = VecFrameStack(vec_env, n_stack=n_stack)
 
 eval_vec_env = VecNormalize(make_vec_env(create_hexapod_env, n_envs=1), norm_obs=False, norm_reward=False)
@@ -189,7 +197,7 @@ checkpoint_callback = CheckpointCallback(
 callback_list = CallbackList([custom_callback, gifRecorder_callback, checkpoint_callback])
 
 model = PPO('MlpPolicy', vec_env, device='cpu', verbose=1)
+# model = PPO.load('/content/drive/MyDrive/HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_results/HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_results_3400000_steps.zip', env=vec_env)
 model.set_logger(new_logger)
 
 model.learn(total_timesteps=10_000_000, progress_bar=True, callback=callback_list)
-
