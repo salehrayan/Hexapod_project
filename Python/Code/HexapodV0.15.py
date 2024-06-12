@@ -19,7 +19,7 @@ from stable_baselines3.common.monitor import Monitor
 obs: 3 + 18
 action: 18
 
-reward ~ speed_x/(1 + speed_y * speed_x) - energy - tibia's tip
+reward ~ speed_x/(1 + speed_y * speed_x + speed_x * num_femur_collisions) - energy - tibia's tip
 
 2 stack
 """
@@ -134,8 +134,10 @@ class HexapodV0(gym.Env):
         # self.hexapod_previous_position_x = hexapod_base_position[0]
         tibia_reward = get_tibia_contacts_reward(self.client, self.hexapod, self.plane, range(2, 18, 3), self.tip_offset)
         tibia_reward_coef = 20
+        num_femur_collisions = check_femur_collisions(self.client, self.hexapod, range(1, 17, 3))
 
-        reward = (velocity_x/(1 + abs(velocity_y) * abs(velocity_x)) - 1 * (terminated) - power_coef * power_term * self.response_time +
+        reward = (velocity_x/(1 + (abs(velocity_y) + num_femur_collisions) * abs(velocity_x)) -
+                  1 * (terminated) - power_coef * power_term * self.response_time +
                   tibia_reward_coef * tibia_reward)
 
         info = {}
@@ -150,7 +152,7 @@ class HexapodV0(gym.Env):
         self.client.disconnect()
 
 
-dir_path = 'HexapodV0_PPO_2stacked_20tibiaContact_directionReward_results'
+dir_path = 'HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_results'
 
 num_envs = 5
 n_stack = 2

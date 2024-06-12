@@ -169,7 +169,7 @@ def get_leg_tip_positions(client, robot_id, leg_end_links, offset):
         link_state = client.getLinkState(robot_id, leg_end_link)
         link_world_position = link_state[4]  # World position of the link
         link_world_orientation = link_state[5]  # World orientation of the link
-        # Calculate the tip position
+        # Get the tip position
         tip_position = transform_position(link_world_position, link_world_orientation, offset)
         leg_positions.append(tip_position)
     return leg_positions
@@ -190,9 +190,15 @@ def get_tibia_contacts_reward(client, hexapod_id, plane_id, tibia_ids, tip_offse
     return -np.nan_to_num(np.sum(np.square(tibia_tip_locations - tibia_contact_points)), nan=0)
 
 
+# Check femur collision
+def check_femur_collisions(client, hexapod_id, femur_links):
+    contact_points = client.getContactPoints(hexapod_id)
+    collision_count = 0
 
+    for contact in contact_points:
+        if (contact[3] in femur_links and contact[4] in femur_links):
+            collision_count += 1
 
-
-
+    return collision_count
 
 
