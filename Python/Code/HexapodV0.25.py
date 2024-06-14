@@ -3,7 +3,7 @@ import pybullet as p
 from pybullet_utils import bullet_client
 import numpy as np
 from time import sleep
-from drive.MyDrive.utils import *
+from utils import *
 import gymnasium as gym
 import math
 from gymnasium import spaces
@@ -32,7 +32,7 @@ class HexapodV0(gym.Env):
     def __init__(self, max_steps=1000, response_time=0.01, render_mode = 'rgb_array'):
         super().__init__()
 
-        self.hexapod_urdf_path = r'/Spider_Assembly_fineMesh_frictionDamp/urdf/Spider_Assembly_fineMesh_frictionDamp.urdf'
+        self.hexapod_urdf_path = r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
 
         # Client and plane
         self.client = bullet_client.BulletClient(connection_mode=p.DIRECT)
@@ -183,18 +183,20 @@ eval_vec_env = VecFrameStack(eval_vec_env, n_stack=n_stack)
 
 new_logger = configure(dir_path, ["csv", "tensorboard"])
 
-gifRecorder_callback = GifRecorderCallback(save_path=dir_path, gif_length=400, record_freq=40_000 * num_envs)
+# gifRecorder_callback = GifRecorderCallback(save_path=dir_path, name_prefix=dir_path.split('/')[-1], gif_length=400, record_freq=500 * num_envs)
 
-
-custom_callback = EvalAndRecordGifCallback(gifRecorder_callback, eval_env=eval_vec_env, eval_freq=40_000,
+custom_callback = EvalAndRecordGifCallback(save_path=dir_path, gif_length=50, record_freq=100,
+                                           eval_env=eval_vec_env, eval_freq=100,
                                           best_model_save_path=dir_path, verbose=1)
+
 checkpoint_callback = CheckpointCallback(
   save_freq=40_000,
   save_path=dir_path,
   name_prefix=dir_path.split('/')[-1],
   save_vecnormalize=True,
 )
-callback_list = CallbackList([custom_callback, gifRecorder_callback, checkpoint_callback])
+
+callback_list = CallbackList([custom_callback, checkpoint_callback])
 
 model = PPO('MlpPolicy', vec_env, device='cpu', verbose=1)
 # model = PPO.load('/content/drive/MyDrive/HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_results/HexapodV0_PPO_2stacked_20tibiaContact_directionRewardWithVelxCoeff_collisionReward_results_3400000_steps.zip', env=vec_env)

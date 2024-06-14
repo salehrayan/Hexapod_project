@@ -97,18 +97,10 @@ class VideoRecorderCallback(BaseCallback):
 
 
 class GifRecorderCallback(BaseCallback):
-    """
-    Custom callback for recording a GIF of the agent during training.
-
-    :param save_path: (str) Path to save the GIF
-    :param gif_length: (int) Length of recorded GIF in frames
-    :param record_freq: (int) Frequency (in steps) at which to record GIFs
-    :param verbose: (int) Verbosity level: 0 for no output, 1 for info messages
-    """
-
-    def __init__(self, save_path, gif_length=500, record_freq=15000, verbose=0):
+    def __init__(self, save_path, name_prefix, gif_length=500, record_freq=15000, verbose=0):
         super(GifRecorderCallback, self).__init__(verbose)
         self.save_path = save_path
+        self.name_prefix = name_prefix
         self.gif_length = gif_length
         self.record_freq = record_freq
         self.frames = []
@@ -127,7 +119,7 @@ class GifRecorderCallback(BaseCallback):
 
             if len(self.frames) >= self.gif_length:
                 reward_info = f"{self.last_eval_reward}" if self.last_eval_reward is not None else "NoReward"
-                gif_path = os.path.join(self.save_path, f"HexapodV0_step-{self.num_timesteps}_reward-{reward_info}.gif")
+                gif_path = os.path.join(self.save_path, f"{self.name_prefix}-{self.num_timesteps}_reward-{reward_info}.gif")
                 imageio.mimsave(gif_path, self.frames, fps=30)
                 self.frames = []
                 self.recording = False
@@ -137,17 +129,41 @@ class GifRecorderCallback(BaseCallback):
     def update_last_eval_reward(self, reward):
         self.last_eval_reward = reward
 
-
 class EvalAndRecordGifCallback(EvalCallback):
-    def __init__(self, gif_recorder_callback, *args, **kwargs):
+    def __init__(self, save_path, gif_length, record_freq, *args, **kwargs):
         super(EvalAndRecordGifCallback, self).__init__(*args, **kwargs)
-        self.gif_recorder_callback = gif_recorder_callback
+        self.save_path = save_path
+        self.gif_length = gif_length
+        self.record_freq = record_freq
+        self.frames = []
+        self.recording = False
+        self.last_eval_reward = None
+
 
     def _on_step(self) -> bool:
+        # Call the parent class's _on_step method to handle evaluation
         result = super(EvalAndRecordGifCallback, self)._on_step()
         if result:
-            self.gif_recorder_callback.update_last_eval_reward(self.last_mean_reward)
+            self.last_eval_reward = self.last_mean_reward
+
+        if self.num_timesteps % (self.record_freq * len(self.training_env.envs)) == 0:
+            self.recording = True
+            self.frames = []
+
+        if self.recording:
+            # Render the first environment in the VecEnv
+            frame = self.training_env.envs[0].render()
+            self.frames.append(frame)
+
+            if len(self.frames) >= self.gif_length:
+                reward_info = f"{self.last_eval_reward}" if self.last_eval_reward is not None else "NoReward"
+                gif_path = os.path.join(self.save_path, f"Hexapod_numSteps_{self.num_timesteps}_reward_{reward_info}.gif")
+                imageio.mimsave(gif_path, self.frames, fps=30)
+                self.frames = []
+                self.recording = False
+
         return result
+
 
 
 
