@@ -8,7 +8,7 @@ from utils import *
 
 """Here I calculate the speed of the base, the torque and angular velocities of the joints and a lot of other stuff"""
 
-hexapod_urdf_path = r'C:\Users\ASUS\Desktop\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
+hexapod_urdf_path = r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
 
 # Client and plane
 client = bullet_client.BulletClient(connection_mode=p.GUI)
