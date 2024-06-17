@@ -8,14 +8,14 @@ from utils import *
 
 """Here I calculate the speed of the base, the torque and angular velocities of the joints and a lot of other stuff"""
 
-hexapod_urdf_path = r'C:\Users\ASUS\Desktop\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
+hexapod_urdf_path = r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\Spider_Assembly_fineMesh_frictionDamp.urdf'
 
 # Client and plane
 client = bullet_client.BulletClient(connection_mode=p.GUI)
 client.setAdditionalSearchPath(pybullet_data.getDataPath())
 client.setGravity(0, 0, -9.81)
 plane = client.loadURDF('plane.urdf')
-client.changeDynamics(plane, -1, lateralFriction=0.01)
+client.changeDynamics(plane, -1, lateralFriction=0.9)
 
 # Camera position set
 camera_target_position = [0.0, 0.0, 0.0]
@@ -87,7 +87,7 @@ while 1:
     # if len(tibia_1_contact_points) > 0:
     #     print(np.array(tibia_1_contact_points[0][5]) - np.array(tibia_1_position))
     tibia_reward = get_tibia_contacts_reward(client, hexapod, plane, range(2, 18, 3), tip_offset)
-    print(tibia_reward)
+    # print(tibia_reward)
 
     elapsed_time = time.time() - start
     hexapod_base_vel = client.getBaseVelocity(hexapod)
@@ -102,7 +102,8 @@ while 1:
             actions.append(joint_param_value)
             # joint_param_value = np.random.rand(1) *2 -1
         client.setJointMotorControlMultiDofArray(hexapod, range(num_joints), client.POSITION_CONTROL, targetPositions=np.array(actions).reshape(-1,1),
-                                     forces=[[1.1]]*18, maxVelocities=[[7.48]]*18)
+                                     forces=[[1.1]]*18, maxVelocities=[[7.48]]*18 #, positionGains = []*18, velocityGains = [1]*18
+                                                 )
         hexapodBasePosition = hexapodBasePosition
         start = time.time()
     # a = [[0]] * 18
