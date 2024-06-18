@@ -2,7 +2,7 @@ import mujoco
 import mujoco.viewer
 
 
-with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\mjmodel.xml', 'r') as f:
+with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\mjmodel _2nd_version.xml', 'r') as f:
   xml = f.read()
 
 # Load the model
