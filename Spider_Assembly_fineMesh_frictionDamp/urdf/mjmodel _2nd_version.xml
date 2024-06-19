@@ -214,6 +214,13 @@
   <sensor>
 <!--    <actuatorfrc name="torqueSensorBaseCoxa1" actuator="motor_base_to_coxa1"/>-->
 
+    <touch name="touchSensorTibia1" site="siteFemur1Tibia1Touch"/>
+    <touch name="touchSensorTibia2" site="siteFemur2Tibia2Touch"/>
+    <touch name="touchSensorTibia3" site="siteFemur3Tibia3Touch"/>
+    <touch name="touchSensorTibia4" site="siteFemur4Tibia4Touch"/>
+    <touch name="touchSensorTibia5" site="siteFemur5Tibia5Touch"/>
+    <touch name="touchSensorTibia6" site="siteFemur6Tibia6Touch"/>
+
     <fromto name="contactLocationTibia1" body1="tibia1" geom2="ground" cutoff="0.001"/>
     <fromto name="contactLocationTibia2" body1="tibia2" geom2="ground" cutoff="0.001"/>
     <fromto name="contactLocationTibia3" body1="tibia3" geom2="ground" cutoff="0.001"/>
@@ -230,13 +237,6 @@
 
     <velocimeter name="baseVelocity" site="siteBase"/>
     <gyro name="baseGyro" site="siteBase"/>
-
-    <touch name="touchSensorTibia1" site="siteFemur1Tibia1Touch"/>
-    <touch name="touchSensorTibia2" site="siteFemur2Tibia2Touch"/>
-    <touch name="touchSensorTibia3" site="siteFemur3Tibia3Touch"/>
-    <touch name="touchSensorTibia4" site="siteFemur4Tibia4Touch"/>
-    <touch name="touchSensorTibia5" site="siteFemur5Tibia5Touch"/>
-    <touch name="touchSensorTibia6" site="siteFemur6Tibia6Touch"/>
 
   </sensor>
 

@@ -1,0 +1,1145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="Spider_Assembly_coarseMesh">
+  <link
+    name="base">
+    <inertial>
+      <origin
+        xyz="-1.22435242071434E-08 1.29268984662366E-08 -0.0217952958440533"
+        rpy="0 0 0" />
+      <mass
+        value="0.817408228215822" />
+      <inertia
+        ixx="0.00230197028141126"
+        ixy="-4.56303857205726E-10"
+        ixz="-1.06328602463094E-10"
+        iyy="0.00230197074252748"
+        iyz="3.08830337299883E-10"
+        izz="0.00422334016271356" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/base.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/base.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="coxa1">
+    <inertial>
+      <origin
+        xyz="0.000663125550137124 0.0352095696133616 -0.0331510755247654"
+        rpy="0 0 0" />
+      <mass
+        value="0.0717810632197289" />
+      <inertia
+        ixx="9.54721414368578E-05"
+        ixy="-1.96343342013829E-06"
+        ixz="8.72518066391113E-07"
+        iyy="4.94854892918883E-05"
+        iyz="2.15672557754048E-05"
+        izz="9.96673239080943E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_to_coxa1"
+    type="revolute">
+    <origin
+      xyz="0 0.1 -0.0229"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="coxa1" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="femur1">
+    <inertial>
+      <origin
+        xyz="-0.000917603435917809 -0.0498608310858832 -0.0049065700001156"
+        rpy="0 0 0" />
+      <mass
+        value="0.0522785969282586" />
+      <inertia
+        ixx="8.65523504380243E-05"
+        ixy="-1.0527935444905E-08"
+        ixz="2.48492567942036E-07"
+        iyy="4.83751696498516E-05"
+        iyz="-2.61567633338843E-06"
+        izz="0.00012438896950017" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.670588235294118 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="coxa1_to_femur1"
+    type="revolute">
+    <origin
+      xyz="0.00095743 0.076318 -0.055226"
+      rpy="0 0 3.129" />
+    <parent
+      link="coxa1" />
+    <child
+      link="femur1" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.5708"
+      upper="2.0944"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="tibia1">
+    <inertial>
+      <origin
+        xyz="0.000424609019419149 -0.0133692193145053 -0.0348652572400883"
+        rpy="0 0 0" />
+      <mass
+        value="0.0673504797309433" />
+      <inertia
+        ixx="0.000145280853138724"
+        ixy="3.00749338857959E-09"
+        ixz="-2.85504977328421E-06"
+        iyy="0.000149431401706523"
+        iyz="-1.58953704257949E-05"
+        izz="3.04035426474145E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="femur1_to_tibia1"
+    type="revolute">
+    <origin
+      xyz="0 -0.099941 -0.0034349"
+      rpy="0 0 0" />
+    <parent
+      link="femur1" />
+    <child
+      link="tibia1" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.0944"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="coxa2">
+    <inertial>
+      <origin
+        xyz="-0.0295313336740724 0.0191847119939432 -0.0331510170996581"
+        rpy="0 0 0" />
+      <mass
+        value="0.071780991789367" />
+      <inertia
+        ixx="6.4112367466337E-05"
+        ixy="2.15075229763735E-05"
+        ixz="-1.78427187091979E-05"
+        iyy="8.08464269442093E-05"
+        iyz="1.21474093700425E-05"
+        izz="9.96688709454487E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_to_coxa2"
+    type="revolute">
+    <origin
+      xyz="-0.086603 0.050001 -0.0229"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="coxa2" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="femur2">
+    <inertial>
+      <origin
+        xyz="-0.000917601723217612 -0.04986082681697 -0.0049067057528593"
+        rpy="0 0 0" />
+      <mass
+        value="0.0522786375653612" />
+      <inertia
+        ixx="8.65516328648969E-05"
+        ixy="-1.03061169099872E-08"
+        ixz="2.48498246144906E-07"
+        iyy="4.83749901232328E-05"
+        iyz="-2.61566070132584E-06"
+        izz="0.000124388387364279" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.670588235294118 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="coxa2_to_femur2"
+    type="revolute">
+    <origin
+      xyz="-0.064264 0.041176 -0.055226"
+      rpy="0 0 -2.1406" />
+    <parent
+      link="coxa2" />
+    <child
+      link="femur2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.5708"
+      upper="2.0944"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="tibia2">
+    <inertial>
+      <origin
+        xyz="0.000424608066344067 -0.0133692943007324 -0.0348653690511171"
+        rpy="0 0 0" />
+      <mass
+        value="0.0673506781396636" />
+      <inertia
+        ixx="0.000145284456530183"
+        ixy="3.27217246581082E-09"
+        ixz="-2.85599081322928E-06"
+        iyy="0.000149435037639596"
+        iyz="-1.58945091184874E-05"
+        izz="3.04033461801385E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="femur2_to_tibia2"
+    type="revolute">
+    <origin
+      xyz="0 -0.099941 -0.0034349"
+      rpy="0 0 0" />
+    <parent
+      link="femur2" />
+    <child
+      link="tibia2" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.0944"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="coxa3">
+    <inertial>
+      <origin
+        xyz="-0.0299717517447422 -0.0184895942763824 -0.0331511392825303"
+        rpy="0 0 0" />
+      <mass
+        value="0.0717813202049348" />
+      <inertia
+        ixx="6.11604235897214E-05"
+        ixy="-2.01103261368796E-05"
+        ixz="-1.86139570621771E-05"
+        iyy="8.38070975445871E-05"
+        iyz="-1.09352026743526E-05"
+        izz="9.9671952952357E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_to_coxa3"
+    type="revolute">
+    <origin
+      xyz="-0.0866040403784443 -0.0499991339745954 -0.0228999999999395"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="coxa3" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="femur3">
+    <inertial>
+      <origin
+        xyz="-0.000917624736773951 -0.0498609692373612 -0.00490492650315436"
+        rpy="0 0 0" />
+      <mass
+        value="0.0522820610067508" />
+      <inertia
+        ixx="8.65519908796291E-05"
+        ixy="-1.04216746668293E-08"
+        ixz="2.48584984480636E-07"
+        iyy="4.83750692018178E-05"
+        iyz="-2.61551293926364E-06"
+        izz="0.000124388689430314" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.670588235294118 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="coxa3_to_femur3"
+    type="revolute">
+    <origin
+      xyz="-0.0647043722150724 -0.0404800288990548 -0.0552258257090417"
+      rpy="0 0 -1.01175485233089" />
+    <parent
+      link="coxa3" />
+    <child
+      link="femur3" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.5708"
+      upper="2.0944"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="tibia3">
+    <inertial>
+      <origin
+        xyz="0.000424599847309087 -0.0133693131195964 -0.0348654064168618"
+        rpy="0 0 0" />
+      <mass
+        value="0.0673507283513013" />
+      <inertia
+        ixx="0.000145282595149621"
+        ixy="2.92515059280337E-09"
+        ixz="-2.85511357106338E-06"
+        iyy="0.000149433307274564"
+        iyz="-1.58950452871018E-05"
+        izz="3.04032763887969E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia3.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia3.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="femur3_to_tibia3"
+    type="revolute">
+    <origin
+      xyz="0 -0.099940988627306 -0.00343493700040796"
+      rpy="0 0 0" />
+    <parent
+      link="femur3" />
+    <child
+      link="tibia3" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.0944"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="coxa4">
+    <inertial>
+      <origin
+        xyz="0.000885989677674163 -0.0352046247835696 -0.0331510799749803"
+        rpy="0 0 0" />
+      <mass
+        value="0.0717810470334122" />
+      <inertia
+        ixx="9.55608525417311E-05"
+        ixy="6.72328914595007E-08"
+        ixz="7.81480847744636E-08"
+        iyy="4.94045063599134E-05"
+        iyz="-2.15876886271167E-05"
+        izz="9.96698540079726E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_to_coxa4"
+    type="revolute">
+    <origin
+      xyz="0 -0.1 -0.0228999999999395"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="coxa4" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="femur4">
+    <inertial>
+      <origin
+        xyz="0.000651467388606948 -0.0498650560611028 -0.00490657004574933"
+        rpy="0 0 0" />
+      <mass
+        value="0.0522785967282734" />
+      <inertia
+        ixx="8.65151319053081E-05"
+        ixy="1.19147435336996E-06"
+        ixz="3.30762654334408E-07"
+        iyy="4.8412387709513E-05"
+        iyz="-2.60655036755864E-06"
+        izz="0.000124388969111385" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.670588235294118 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="coxa4_to_femur4"
+    type="revolute">
+    <origin
+      xyz="0.00240418464234264 -0.0762856395586871 -0.0552258257090417"
+      rpy="0 0 0" />
+    <parent
+      link="coxa4" />
+    <child
+      link="femur4" />
+    <axis
+      xyz="0.999503754376516 0.0314999204324345 0" />
+    <limit
+      lower="-1.5708"
+      upper="2.0944"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="tibia4">
+    <inertial>
+      <origin
+        xyz="0.000422605995939832 -0.0133692209485378 -0.0348652628092903"
+        rpy="0 0 0" />
+      <mass
+        value="0.0673505152068522" />
+      <inertia
+        ixx="0.000145280882750576"
+        ixy="3.00991963181326E-09"
+        ixz="-2.85504341798177E-06"
+        iyy="0.000149431436115591"
+        iyz="-1.5895371734705E-05"
+        izz="3.0403536234529E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia4.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia4.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="femur4_to_tibia4"
+    type="revolute">
+    <origin
+      xyz="0.00314813318969895 -0.0998913933490931 -0.00343493700040778"
+      rpy="0 0 0.0315051320328271" />
+    <parent
+      link="femur4" />
+    <child
+      link="tibia4" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.0944"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="coxa5">
+    <inertial>
+      <origin
+        xyz="0.0301276039767766 -0.0182340396866558 -0.0331510169111329"
+        rpy="0 0 0" />
+      <mass
+        value="0.0717809896930594" />
+      <inertia
+        ixx="6.27595056291029E-05"
+        ixy="2.09309419575564E-05"
+        ixz="1.82207011558222E-05"
+        iyy="8.21992905470186E-05"
+        iyz="-1.1572736377178E-05"
+        izz="9.96688629026252E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa5.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_to_coxa5"
+    type="revolute">
+    <origin
+      xyz="0.0866010403784438 -0.0500008660254042 -0.0228999999999395"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="coxa5" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="femur5">
+    <inertial>
+      <origin
+        xyz="-0.000917601737713876 -0.0498608267913493 -0.0049067057523189"
+        rpy="0 0 0" />
+      <mass
+        value="0.0522786375678467" />
+      <inertia
+        ixx="8.65516328686477E-05"
+        ixy="-1.03061158953592E-08"
+        ixz="2.484982488976E-07"
+        iyy="4.83749901246592E-05"
+        iyz="-2.61566070684412E-06"
+        izz="0.000124388387368663" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur5.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.670588235294118 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="coxa5_to_femur5"
+    type="revolute">
+    <origin
+      xyz="0.0655430603260938 -0.0391074899028941 -0.0552258257090417"
+      rpy="0 0 1.03282994251623" />
+    <parent
+      link="coxa5" />
+    <child
+      link="femur5" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.5708"
+      upper="2.0944"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="tibia5">
+    <inertial>
+      <origin
+        xyz="0.000424606202645996 -0.0133692937871692 -0.0348653671064807"
+        rpy="0 0 0" />
+      <mass
+        value="0.0673506926014553" />
+      <inertia
+        ixx="0.000145284461921525"
+        ixy="3.27337598415401E-09"
+        ixz="-2.85599286529692E-06"
+        iyy="0.000149435041555011"
+        iyz="-1.58945140077071E-05"
+        izz="3.04033475535613E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia5.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia5.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="femur5_to_tibia5"
+    type="revolute">
+    <origin
+      xyz="0 -0.099940988627306 -0.00343493700040753"
+      rpy="0 0 0" />
+    <parent
+      link="femur5" />
+    <child
+      link="tibia5" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.0944"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="coxa6">
+    <inertial>
+      <origin
+        xyz="0.0293933665415972 0.0193958988857937 -0.033151138449173"
+        rpy="0 0 0" />
+      <mass
+        value="0.0717813148313424" />
+      <inertia
+        ixx="6.2408731520959E-05"
+        ixy="-2.07638378192187E-05"
+        ixz="1.82714706983258E-05"
+        iyy="8.25587792410334E-05"
+        iyz="1.14983171602086E-05"
+        izz="9.96719500217779E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa6.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/coxa6.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="base_to_coxa6"
+    type="revolute">
+    <origin
+      xyz="0.086602 0.049999 -0.0229"
+      rpy="0 0 0" />
+    <parent
+      link="base" />
+    <child
+      link="coxa6" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.0472"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="femur6">
+    <inertial>
+      <origin
+        xyz="-0.000917624745304945 -0.0498609692199319 -0.00490492650174519"
+        rpy="0 0 0" />
+      <mass
+        value="0.0522820610074516" />
+      <inertia
+        ixx="8.6551990885199E-05"
+        ixy="-1.04216760627969E-08"
+        ixz="2.48584986064876E-07"
+        iyy="4.83750692033707E-05"
+        iyz="-2.61551294359893E-06"
+        izz="0.000124388689435006" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur6.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 0.670588235294118 0 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/femur6.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="coxa6_to_femur6"
+    type="revolute">
+    <origin
+      xyz="0.063439 0.042436 -0.055226"
+      rpy="0 0 2.1604" />
+    <parent
+      link="coxa6" />
+    <child
+      link="femur6" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-1.5708"
+      upper="2.0944"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+  <link
+    name="tibia6">
+    <inertial>
+      <origin
+        xyz="0.000424598554227635 -0.0133693089521966 -0.0348653944299927"
+        rpy="0 0 0" />
+      <mass
+        value="0.0673507344744126" />
+      <inertia
+        ixx="0.000145282611254139"
+        ixy="2.92831367924341E-09"
+        ixz="-2.85512274310963E-06"
+        iyy="0.000149433314224666"
+        iyz="-1.58950479389E-05"
+        izz="3.04032810817849E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia6.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.792156862745098 0.819607843137255 0.933333333333333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://Spider_Assembly_coarseMesh/meshes/tibia6.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="femur6_to_tibia6"
+    type="revolute">
+    <origin
+      xyz="0 -0.099941 -0.0034349"
+      rpy="0 0 0" />
+    <parent
+      link="femur6" />
+    <child
+      link="tibia6" />
+    <axis
+      xyz="1 0 0" />
+    <limit
+      lower="-2.0944"
+      upper="1.0472"
+      effort="10"
+      velocity="10" />
+    <dynamics
+      damping="0.05"
+      friction="0.25" />
+  </joint>
+</robot>
