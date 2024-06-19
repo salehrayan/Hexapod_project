@@ -3,7 +3,7 @@ import mujoco.viewer
 import numpy as np
 
 
-with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\mjmodel _2nd_versionNoFrictionLoss_noCoxaCon.xml', 'r') as f:
+with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair.xml', 'r') as f:
   xml = f.read()
 
 # Load the model
@@ -26,7 +26,9 @@ mujoco.viewer.launch(model, data)
 #     data.ctrl = np.random.rand(model.nu) * 2 - 1
 #     mujoco.mj_step(model, data)
 #     mujoco.mj_forward(model, data)
-#     some_sensor = data.sensor(6).data
-#     print(some_sensor)
+#     # data.site_xpos[4] = np.array([0, 0, 0.5])
+#     site = data.site_xpos[4]
+#     joint_anchor = data.xanchor[3]
+#     print(site - joint_anchor)
 #     viewer.sync()
 

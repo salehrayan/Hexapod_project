@@ -7,21 +7,21 @@ import numpy as np
 
 
 
-with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\mjmodel _2nd_versionNoFrictionLoss_noCoxaCon.xml', 'r') as f:
+with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair.xml', 'r') as f:
   xml = f.read()
 
-# xml = """
-# <mujoco>
-#   <worldbody>
-#     <light name="top" pos="0 0 1"/>
-#     <body name="box_and_sphere" euler="0 0 -30">
-#       <joint name="swing" type="hinge" axis="1 -1 0" pos="-.2 -.2 -.2"/>
-#       <geom name="red_box" type="box" size=".2 .2 .2" rgba="1 0 0 1"/>
-#       <geom name="green_sphere" pos=".2 .2 .2" size=".1" rgba="0 1 0 1"/>
-#     </body>
-#   </worldbody>
-# </mujoco>
-# """
+xml = """
+<mujoco>
+  <worldbody>
+    <light name="top" pos="0 0 1"/>
+    <body name="box_and_sphere" euler="0 0 -30">
+      <joint name="swing" type="hinge" axis="1 -1 0" pos="-.2 -.2 -.2"/>
+      <geom name="red_box" type="box" size=".2 .2 .2" rgba="1 0 0 1"/>
+      <geom name="green_sphere" pos=".2 .2 .2" size=".1" rgba="0 1 0 1"/>
+    </body>
+  </worldbody>
+</mujoco>
+"""
 
 mj_model = mujoco.MjModel.from_xml_string(xml)
 mj_data = mujoco.MjData(mj_model)
