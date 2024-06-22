@@ -48,7 +48,8 @@ class HexapodV0_3(PipelineEnv):
                  baseOscillationSigma=0.2,
                  baseOscillationCoef=1,
 
-                 rewardForTibiaTip=False,
+                 rewardForTibiaTip=True,
+                 tibiaRewardSigma=0.1,
                  tibiaRewardCoef=1,
 
                  powerCoef=0.001,
@@ -59,7 +60,7 @@ class HexapodV0_3(PipelineEnv):
                  nStacks=5,
                  physics_steps_per_control_step=0.05/0.002,
 
-                 resetPosLowHigh=[jp.array([-0.2, -0.2, 0.23]), jp.array([0.2, 0.2, 0.4])],
+                 resetPosLowHigh=[jp.array([-0.2, -0.2, 0.23]), jp.array([0.2, 0.2, 0.43])],
                  resetOriLowHigh=[jp.array([-math.pi/12, -math.pi/12, -math.pi]), jp.array([math.pi/12, math.pi/12, -math.pi])],
                  resetJointsPosLowHigh = [jp.array([-math.pi/12]*18), jp.array([math.pi/12]*18)],
                  resetJointsVelsLowHigh=[jp.array([-0.3]*24), jp.array([-0.3]*24)],
@@ -67,7 +68,7 @@ class HexapodV0_3(PipelineEnv):
                  ):
 
         self.mj_model = mujoco.MjModel.from_xml_path(xml_path)
-        self.mj_model.opt.solver = mujoco.mjtSolver.mjSOL_CG
+        self.mj_model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
         self.mj_model.opt.iterations = 6
         self.mj_model.opt.ls_iterations = 6
 
@@ -94,6 +95,7 @@ class HexapodV0_3(PipelineEnv):
         self._baseOscillationSigma = baseOscillationSigma
         self._baseOscillationCoef = baseOscillationCoef
         self._rewardForTibiaTip = rewardForTibiaTip
+        self._tibiaRewardSigma = tibiaRewardSigma
         self._tibiaRewardCoef = tibiaRewardCoef
         self._powerCoef = powerCoef
         self._continuityCoef = continuityCoef
@@ -152,6 +154,9 @@ class HexapodV0_3(PipelineEnv):
         prev_pipeline_state = state.pipeline_state
         pipeline_state = self.pipeline_step(prev_pipeline_state, action)
         obs, historic_action = self._get_obs(pipeline_state, action, obs_history=state.obs)
+
+        # print(pipeline_state.contact.includemargin * pipeline_state.contact.link_idx[1])
+        print(pipeline_state.site_xpos[7])
 
         # prev_base_pos = prev_pipeline_state.x.pos[0,:]
         prev_base_pos = prev_pipeline_state.subtree_com[0]
@@ -232,10 +237,14 @@ class HexapodV0_3(PipelineEnv):
         jp.abs(pipeline_state.subtree_com[14] - pipeline_state.subtree_com[17]).sum()])
         mimimum_femur_dist = femur_dists.min()
 
-        femur_reward = self._femurCollisionCoef * jp.exp(-mimimum_femur_dist**2/self._femurCollisionSigma**2)
+        femur_reward = self._femurCollisionCoef / mimimum_femur_dist
         return femur_reward
 
-
+    def _get_tibia_rewad(self, pipeline_state: State) -> jp.ndarray:
+        tibia_reward_accumulate = jp.zeros(1)
+        for i in range(2,8):
+            tibia_reward_accumulate += pipeline_state.site_xpos[i]
+        tibia_reward = self._tibiaRewardCoef * jp.exp(-tibia_reward_accumulate**2/self._tibiaRewardSigma**2)
     def _euler_to_quaternion(self, euler):
         """Converts Euler angles to quaternion."""
         roll, pitch, yaw = euler
@@ -255,17 +264,17 @@ class HexapodV0_3(PipelineEnv):
 
 
 env = HexapodV0_3(xml_path=xml_path)
-jit_reset = jax.jit(env.reset)
-jit_step = jax.jit(env.step)
-# state = env.reset(jax.random.PRNGKey(0))
+# jit_reset = jax.jit(env.reset)
+# jit_step = jax.jit(env.step)
+state = env.reset(jax.random.PRNGKey(0))
 
-state = jit_reset(jax.random.PRNGKey(0))
+# state = jit_reset(jax.random.PRNGKey(0))
 rollout = [state.pipeline_state]
 
 # grab a trajectory
 for i in range(100):
   ctrl = -0.1 * jp.ones(env.sys.nu)
-  state = jit_step(state, ctrl)
+  state = env.step(state, ctrl)
   rollout.append(state.pipeline_state)
 
 clip = ImageSequenceClip(env.render(rollout, camera='hexapod_camera'), fps=1.0 / env.dt)

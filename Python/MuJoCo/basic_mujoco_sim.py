@@ -55,8 +55,10 @@ with  mujoco.viewer.launch_passive(model, data) as viewer:
     mujoco.mj_step(model, data)
     mujoco.mj_forward(model, data)
     # data.site_xpos[0] = np.array([0, 0, 0.4])
-    print(data.sensordata[4])
-    # break
+    for i in range(1,8):
+      print(f'tibiaSiteId{i} : ', mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE.value, f'siteFemur{i}Tibia{i}Touch'))
+    # print(data.sensordata[4])
+    break
     i += 1
     viewer.sync()
   viewer.close()
