@@ -5,10 +5,10 @@
 
   <compiler angle="radian" meshdir="/content/Spider_Assembly_coarseMesh/meshes/"/>
 
-  <visual>
-    <headlight ambient="0.2 0.2 0.2" diffuse="0.7 0.7 0.7"/>
+<!--  <visual>-->
+<!--    <headlight ambient="0.2 0.2 0.2" diffuse="0.3 0.7 0.7"/>-->
 <!--    <global offwidth="my_width"/>-->
-  </visual>
+<!--  </visual>-->
 
   <asset>
     <mesh name="base" file="base.STL"/>
@@ -39,9 +39,11 @@
   </asset>
 
   <worldbody>
+    <camera name="hexapod_camera" mode="targetbody" target="base" pos="0.000 -1.414 1.414" xyaxes="1.000 -0.000 0.000 0.000 0.707 0.707"/>
     <geom name="ground" type="plane" pos="0 0 0" size="0 0 0.1" material="grid" friction="0.9 0.005 0.0001" group="1"/>
 
     <body name="base" pos="0.0 0.0 0.23">
+      <light name="top" pos="0 0 1"/>
       <site name="siteBase" size="0.0001"/>
       <inertial pos="-1.2244e-08 1.2927e-08 -0.021795" quat="0.653281 0.270598 -0.653281 0.270598" mass="1.5" diaginertia="0.0042233 0.002302 0.002302"/>
       <freejoint  name="world_to_base"/>
@@ -239,7 +241,7 @@
     <pair geom1="ground" geom2="tibia4"/>
     <pair geom1="ground" geom2="tibia5"/>
     <pair geom1="ground" geom2="tibia6"/>
-    <pair geom1="ground" geom2="base"/>
+<!--    <pair geom1="ground" geom2="base"/>-->
 
     <pair geom1="femur1" geom2="femur2"/>
     <pair geom1="femur1" geom2="femur6"/>
