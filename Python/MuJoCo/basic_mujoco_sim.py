@@ -1,5 +1,6 @@
 import math
 import pybullet as p
+import os
 import mujoco
 import mujoco.viewer
 import numpy as np
@@ -8,9 +9,10 @@ import jax
 from moviepy.editor import ImageSequenceClip
 from scipy.spatial.transform import Rotation
 
+# os.environ['MUJOCO_GL'] = 'EGL'
 
 r = Rotation
-with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair.xml', 'r') as f:
+with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml', 'r') as f:
   xml = f.read()
 
 # Load the model
@@ -34,34 +36,34 @@ duration = 4
 fps = 60
 
 i=0
-# mujoco.viewer.launch(model, data)
-with  mujoco.viewer.launch_passive(model, data) as viewer:
-  while viewer.is_running():
-
-    if i % 150 == 0:
-      rng = jax.random.PRNGKey(i)
-      data.qpos[0:3] = jax.random.uniform(key=rng, shape=(3,), minval=jax.numpy.array([-0.2, -0.2, 0.23]),
-                                          maxval=jax.numpy.array([0.2, 0.2, 0.4]))
-      rollPitchYaw = jax.random.uniform(key=rng, shape=(3,), minval=jax.numpy.array([-math.pi/12, -math.pi/12, -math.pi]),
-                                        maxval=jax.numpy.array([math.pi/12, math.pi/12, math.pi]))
-      # print(rollPitchYaw)
-      b = r.from_euler('xyz', rollPitchYaw, degrees=False)
-      c = p.getQuaternionFromEuler(rollPitchYaw)
-      data.qpos[3:7] = np.roll(c, 1)
-
-
-      # mujoco.mj_forward(model, data)
-    # data.ctrl = np.random.rand(model.nu) * 2 - 1
-    mujoco.mj_step(model, data)
-    mujoco.mj_forward(model, data)
-    # data.site_xpos[0] = np.array([0, 0, 0.4])
-    for i in range(1,8):
-      print(f'tibiaSiteId{i} : ', mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE.value, f'siteFemur{i}Tibia{i}Touch'))
-    # print(data.sensordata[4])
-    break
-    i += 1
-    viewer.sync()
-  viewer.close()
+mujoco.viewer.launch()
+# with  mujoco.viewer.launch_passive(model, data) as viewer:
+#   while viewer.is_running():
+#
+#     if i % 150 == 0:
+#       rng = jax.random.PRNGKey(i)
+#       data.qpos[0:3] = jax.random.uniform(key=rng, shape=(3,), minval=jax.numpy.array([-0.2, -0.2, 0.23]),
+#                                           maxval=jax.numpy.array([0.2, 0.2, 0.4]))
+#       rollPitchYaw = jax.random.uniform(key=rng, shape=(3,), minval=jax.numpy.array([-math.pi/12, -math.pi/12, -math.pi]),
+#                                         maxval=jax.numpy.array([math.pi/12, math.pi/12, math.pi]))
+#       # print(rollPitchYaw)
+#       b = r.from_euler('xyz', rollPitchYaw, degrees=False)
+#       c = p.getQuaternionFromEuler(rollPitchYaw)
+#       data.qpos[3:7] = np.roll(c, 1)
+#
+#
+#       # mujoco.mj_forward(model, data)
+#     # data.ctrl = np.random.rand(model.nu) * 2 - 1
+#     mujoco.mj_step(model, data)
+#     mujoco.mj_forward(model, data)
+#     # data.site_xpos[0] = np.array([0, 0, 0.4])
+#     for i in range(1,8):
+#       print(f'tibiaSiteId{i} : ', mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_SITE, f'siteFemur{i}Tibia{i}Touch'))
+#     # print(data.sensordata[4])
+#     # break
+#     i += 1
+#     viewer.sync()
+#   viewer.close()
 
 
 # frames = []
