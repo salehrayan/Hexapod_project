@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from typing import List, Sequence
+import functools
 
 import mujoco
 import mujoco.viewer
@@ -15,9 +16,10 @@ from brax.base import Base, Motion, Transform
 from brax.envs.base import Env, PipelineEnv, State
 from brax.mjx.base import State as MjxState
 from brax.training.agents.ppo import train as ppo
+from brax.training.agents.es import train as es
 from brax.training.agents.ppo import networks as ppo_networks
+from brax.training.agents.es import networks as es_networks
 from brax.io import html, mjcf, model
-
 from moviepy.editor import ImageSequenceClip
 
 """ Hexapod massively parallel training using MuJoCo + Brax + JAX
@@ -49,7 +51,7 @@ class HexapodV0_3(PipelineEnv):
                  baseOscillationCoef=1,
 
                  rewardForTibiaTip=True,
-                 tibiaRewardSigma=0.1,
+                 tibiaRewardSigma=0.05,
                  tibiaRewardCoef=1,
 
                  powerCoef=0.001,
@@ -156,7 +158,7 @@ class HexapodV0_3(PipelineEnv):
         obs, historic_action = self._get_obs(pipeline_state, action, obs_history=state.obs)
 
         # print(pipeline_state.contact.includemargin * pipeline_state.contact.link_idx[1])
-        print(pipeline_state.site_xpos[7])
+        print((jp.abs(pipeline_state.contact.dist[1:12:2]) < 0.03) * jp.ones(6))
 
         # prev_base_pos = prev_pipeline_state.x.pos[0,:]
         prev_base_pos = prev_pipeline_state.subtree_com[0]
@@ -166,6 +168,9 @@ class HexapodV0_3(PipelineEnv):
         base_ori = pipeline_state.x.rot[0,:]
         base_tilt = (jp.linalg.norm(base_ori[0:2]))
         deviation_angle = jp.atan(displacement[1]/displacement[0])
+
+        tibia_reward = self._get_tibia_rewad(pipeline_state)
+        print(tibia_reward)
 
         velocity = displacement / self.dt
         correctDirectionReward = self._correctDirectionWeight * jp.exp(-(5-velocity[0])**2/self._correctDirectionSigma**2)
@@ -229,22 +234,20 @@ class HexapodV0_3(PipelineEnv):
         return obs, historic_action
 
     def _get_femur_reward(self, pipeline_state):
-        femur_dists = jp.stack([jp.abs(pipeline_state.subtree_com[2] - pipeline_state.subtree_com[5]).sum(),
-        jp.abs(pipeline_state.subtree_com[2] - pipeline_state.subtree_com[17]).sum(),
-        jp.abs(pipeline_state.subtree_com[8] - pipeline_state.subtree_com[5]).sum(),
-        jp.abs(pipeline_state.subtree_com[8] - pipeline_state.subtree_com[11]).sum(),
-        jp.abs(pipeline_state.subtree_com[14] - pipeline_state.subtree_com[11]).sum(),
-        jp.abs(pipeline_state.subtree_com[14] - pipeline_state.subtree_com[17]).sum()])
-        mimimum_femur_dist = femur_dists.min()
-
-        femur_reward = self._femurCollisionCoef / mimimum_femur_dist
+        femur_dists = pipeline_state.contact.dist[12:]
+        # femur_dists_norm = (femur_dists -femur_dists.min()) / (femur_dists.max() - femur_dists.min())
+        entropy = 0.5 * jp.log(2 * jp.pi * jp.e * femur_dists.std()**2)
+        # femur_reward = self._femurCollisionCoef * (1 - jax.nn.sigmoid(entropy))
+        femur_reward = 0.1 * entropy
         return femur_reward
-
     def _get_tibia_rewad(self, pipeline_state: State) -> jp.ndarray:
-        tibia_reward_accumulate = jp.zeros(1)
+        contact_dists = pipeline_state.contact.dist[1:12:2]
+        contact_booleans = (jp.abs(contact_dists) < 0.03) * jp.ones(6)
+        tibia_tip_dists = jp.zeros(1)
         for i in range(2,8):
-            tibia_reward_accumulate += pipeline_state.site_xpos[i]
-        tibia_reward = self._tibiaRewardCoef * jp.exp(-tibia_reward_accumulate**2/self._tibiaRewardSigma**2)
+            tibia_tip_dists += contact_booleans[i-2] * pipeline_state.site_xpos[i, 2]
+        tibia_reward = self._tibiaRewardCoef * jp.exp(-tibia_tip_dists**2/self._tibiaRewardSigma**2)
+        return tibia_reward
     def _euler_to_quaternion(self, euler):
         """Converts Euler angles to quaternion."""
         roll, pitch, yaw = euler
