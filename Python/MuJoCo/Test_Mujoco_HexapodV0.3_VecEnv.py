@@ -1,5 +1,4 @@
 import time
-
 import numpy as np
 import math
 from typing import List, Sequence
@@ -22,8 +21,8 @@ maximize speed in desired direction
 """
 
 xml_path = r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml'
-num_envs = 10
-timeStepsPerControlStep = 10
+num_envs = 2
+timeStepsPerControlStep = 2
 
 
 class HexapodV0_3VecEnv(VectorEnv):
@@ -101,8 +100,8 @@ class HexapodV0_3VecEnv(VectorEnv):
         self._resetJointsPosLowHigh = resetJointsPosLowHigh
         self._resetJointsVelsLowHigh = resetJointsVelsLowHigh
 
-        self.num_steps = 0
-        self.max_steps = max_steps
+        self.num_steps = jp.zeros(1)
+        self.max_steps = jp.array([max_steps])
         self.reset_infos = {'reset_mjx_datas': None, 'current_mjx_datas': None}
         self.current_mjx_datas = 0
 
@@ -169,6 +168,7 @@ class HexapodV0_3VecEnv(VectorEnv):
                                            self.rng2)
         self.current_mjx_datas = mjx_datas
         self.rng2 = key
+        self.num_steps = self.num_steps.at[:].add(1)
 
         return obs, rewards, dones, infos
 
@@ -192,7 +192,7 @@ class HexapodV0_3VecEnv(VectorEnv):
         obs = self._get_obs(mjx_data)
         reward = 0
 
-        truncated = jp.array([self.num_steps == self.max_steps], dtype=jp.bool_)
+        truncated = self.num_steps == self.max_steps
         terminated = jp.array([0], dtype=jp.bool_)
         done = truncated | terminated
 
@@ -226,17 +226,30 @@ class HexapodV0_3VecEnv(VectorEnv):
 env = HexapodV0_3VecEnv(xml_path=xml_path, num_envs=num_envs, timeStepsPerControlStep=timeStepsPerControlStep, max_steps=20)
 # jit_reset = jax.jit(env.reset)
 obs, _ = env.reset()
-print(obs, '\n------------------------------------------------------')
-print(env.current_mjx_datas.qpos, '\n***************************************************')
+time_after_reset = time.time()
+print(obs.shape, '\n------------------------------------------------------')
+print(env.current_mjx_datas.qpos.shape, '\n***************************************************')
+
 actions = jax.random.uniform(key=jax.random.PRNGKey(31), shape=(num_envs, 18,),
-                                                                 minval=jp.array([-0.5]*18), maxval=jp.array([0.5]*18))
+                             minval=jp.array([-0.5] * 18), maxval=jp.array([0.5] * 18))
 
-for i in range(2):
+obs, rewards, dones, infos = env.step(actions=actions)
+time_after_first_action = time.time()
+print(f'time to jit: {(time_after_first_action - time_after_reset) / 60.}')
+print(obs.shape, env.num_steps, dones, '\n------------------------------------------------------')
+print(env.current_mjx_datas.qpos.shape, '\n***************************************************')
+
+for i in range(5):
+    time_before_action = time.time()
+    actions = jax.random.uniform(key=jax.random.PRNGKey(31), shape=(num_envs, 18,),
+                                 minval=jp.array([-0.5] * 18), maxval=jp.array([0.5] * 18))
+
     obs, rewards, dones, infos = env.step(actions=actions)
-    print(obs, '\n------------------------------------------------------')
-    print(env.current_mjx_datas.qpos, '\n***************************************************')
+    time_after_action = time.time()
+    print(f'time to step: {time_after_action - time_before_action}')
+    print(obs.shape, env.num_steps, dones, '\n------------------------------------------------------')
+    print(env.current_mjx_datas.qpos.shape, '\n***************************************************')
 
-t = 4
 # jit_reset = jax.jit(env.reset)
 # jit_step = jax.jit(env.step)
 # state = env.reset(jax.random.PRNGKey(0))
