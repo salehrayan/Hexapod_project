@@ -17,8 +17,10 @@ from brax.envs.base import Env, PipelineEnv, State
 from brax.mjx.base import State as MjxState
 from brax.training.agents.ppo import train as ppo
 from brax.training.agents.es import train as es
+from brax.training.agents.sac import train as sac
 from brax.training.agents.ppo import networks as ppo_networks
 from brax.training.agents.es import networks as es_networks
+from brax.training.agents.sac import networks as sac_networks
 from brax.io import html, mjcf, model
 from moviepy.editor import ImageSequenceClip
 

@@ -15,7 +15,7 @@ client = bullet_client.BulletClient(connection_mode=p.GUI)
 client.setAdditionalSearchPath(pybullet_data.getDataPath())
 client.setGravity(0, 0, -9.81)
 plane = client.loadURDF('plane.urdf')
-client.changeDynamics(plane, -1, lateralFriction=0.01)
+client.changeDynamics(plane, -1, lateralFriction=0.9)
 
 # Camera position set
 camera_target_position = [0.0, 0.0, 0.0]
@@ -102,8 +102,12 @@ while 1:
             joint_param_value = client.readUserDebugParameter(joint_param_ids[joint_index])
             actions.append(joint_param_value)
             # joint_param_value = np.random.rand(1) *2 -1
-        client.setJointMotorControlMultiDofArray(hexapod, range(num_joints), client.POSITION_CONTROL, targetPositions=np.array(actions).reshape(-1,1),
-                                     forces=[[1.1]]*18, maxVelocities=[[7.48]]*18)
+        client.setJointMotorControlMultiDofArray(hexapod, range(num_joints), client.POSITION_CONTROL,
+                                                 targetPositions=np.array(actions).reshape(-1,1),
+                                     forces=[[1.1]]*18, maxVelocities=[[7.48]]*18,
+                                                 # positionGains=[10]*18,
+                                                 # velocityGains=[1]*18
+                                                 )
         hexapodBasePosition = hexapodBasePosition
         start = time.time()
     # a = [[0]] * 18
