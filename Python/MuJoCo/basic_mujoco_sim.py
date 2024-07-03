@@ -36,7 +36,7 @@ duration = 4
 fps = 60
 
 i=0
-# mujoco.viewer.launch()
+mujoco.viewer.launch(model, data)
 with  mujoco.viewer.launch_passive(model, data) as viewer:
   while viewer.is_running():
 

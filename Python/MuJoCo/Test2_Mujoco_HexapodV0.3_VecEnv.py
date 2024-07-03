@@ -16,18 +16,17 @@ from stable_baselines3.common.vec_env import VecEnv
 from gymnasium import spaces
 from gymnasium.vector import VectorEnv
 
-
 """ Hexapod massively parallel training using MuJoCo + 
 maximize speed in desired direction
 """
 
 xml_path = r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml'
-num_envs = 2
+num_envs = 3
 timeStepsPerControlStep = 2
 
 
 class HexapodV0_3VecEnv(VectorEnv):
-    metadata = {"render_modes": ["rgb_array"], "render_fps": 30}
+    metadata = {"render_modes": ["rgb_array"]}
 
     def __init__(self,
                  xml_path,
@@ -65,7 +64,6 @@ class HexapodV0_3VecEnv(VectorEnv):
                  includeBaseAngularVels=True,
                  includeTibiaTipSensors=False,
                  nStacks=3,
-                 physics_steps_per_control_step=10,
 
                  resetPosLowHigh=[jp.array([-0.2, -0.2, 0.23]), jp.array([0.2, 0.2, 0.4])],
                  resetOriLowHigh=[jp.array([-math.pi / 12, -math.pi / 12, -math.pi]),
@@ -79,7 +77,9 @@ class HexapodV0_3VecEnv(VectorEnv):
         self.mj_model.opt.iterations = 6
         self.mj_model.opt.ls_iterations = 6
         self.mj_model.opt.timestep = 0.002
-        self.dt = self.mj_model.opt.timestep * self.timeStepsPerControlStep
+        self.dt = self.mj_model.opt.timestep * timeStepsPerControlStep
+
+        self.renderer = mujoco.Renderer(self.mj_model, height=480, width=640)
 
         self.mjx_model = mjx.put_model(self.mj_model)
         self.timeStepsPerControlStep = timeStepsPerControlStep
@@ -117,16 +117,16 @@ class HexapodV0_3VecEnv(VectorEnv):
         # self._get_obs = jax.jit(self._get_obs)
 
     def reset(self):
-        keys = jax.random.split(self.rng1, self.num_envs)
-        obs, mjx_datas, returned_keys = self._reset(jp.array(keys), self.mjx_model)
-        self.rng1 = returned_keys[1]
+        keys = jax.random.split(self.rng1, self.num_envs + 1)
+        obs, mjx_datas, returned_keys = self._reset(jp.array(keys[:-1]), self.mjx_model)
+        self.rng1 = keys[-1]
         self.current_mjx_datas = mjx_datas
         return obs, {}
 
     def steps_reset(self, key):
-        keys = jax.random.split(key, self.num_envs)
-        obs, mjx_datas, returned_keys = self._reset(jp.array(keys), self.mjx_model)
-        return obs, {}, mjx_datas, returned_keys[1]
+        keys = jax.random.split(key, self.num_envs + 1)
+        obs, mjx_datas, returned_keys = self._reset(jp.array(keys[:-1]), self.mjx_model)
+        return obs, {}, mjx_datas, keys[-1]
 
     @functools.partial(jax.jit, static_argnums=0)
     @functools.partial(jax.vmap, in_axes=(None, 0, None))
@@ -158,8 +158,11 @@ class HexapodV0_3VecEnv(VectorEnv):
 
     def step(self, actions):
         actions = jp.array(actions)
-        obs, rewards, dones, infos, mjx_datas = self._step(actions, self.mjx_model, self.current_mjx_datas, self.num_steps)
         infos = {}
+
+        obs, rewards, dones, infos, mjx_datas = self._step(actions, self.mjx_model, self.current_mjx_datas,
+                                                           self.num_steps)
+        infos = tuple(map(lambda value: {"TimeLimit.truncated": value}, infos["TimeLimit.truncated"]))
         self.current_mjx_datas = mjx_datas
 
         reset_condition = jp.any(dones[:, 0])
@@ -191,11 +194,11 @@ class HexapodV0_3VecEnv(VectorEnv):
         obs = self._get_obs(mjx_model, mjx_data)
         reward = 0
 
-        truncated = num_steps == self.max_steps
+        truncated = ((num_steps + 1) % self.max_steps == 0)
         terminated = jp.array([0], dtype=jp.bool_)
         done = truncated | terminated
 
-        info = {}
+        info = {"TimeLimit.truncated" : truncated}
 
         return obs, reward, done, info, mjx_data
 
@@ -207,6 +210,13 @@ class HexapodV0_3VecEnv(VectorEnv):
 
         obs = jp.concatenate((base_ang_vel, joints_pos), axis=0)
         return obs
+
+    def render(self):
+        mj_data = mjx.get_data(self.mj_model, self.current_mjx_datas)
+        mujoco.mj_forward(self.mj_model, mj_data[1])
+        self.renderer.update_scene(mj_data[1], camera='hexapod_camera')
+        pixels = self.renderer.render()
+        return pixels
 
     @functools.partial(jax.jit, static_argnums=0)
     def _euler_to_quaternion(self, euler):
@@ -223,48 +233,31 @@ class HexapodV0_3VecEnv(VectorEnv):
         return jp.array([qw, qx, qy, qz])
 
 
-env = HexapodV0_3VecEnv(xml_path=xml_path, num_envs=num_envs, timeStepsPerControlStep=timeStepsPerControlStep, max_steps=20)
+env = HexapodV0_3VecEnv(xml_path=xml_path, num_envs=num_envs, timeStepsPerControlStep=timeStepsPerControlStep,
+                        max_steps=375)
 # jit_reset = jax.jit(env.reset)
+rollout = []
 obs, _ = env.reset()
-time_after_reset = time.time()
+rollout.append(env.render())
+# time_after_reset = time.time()
 print(obs.shape, '\n------------------------------------------------------')
-print(env.current_mjx_datas.qpos.shape, '\n***************************************************')
 
-actions = jax.random.uniform(key=jax.random.PRNGKey(31), shape=(num_envs, 18,),
-                             minval=jp.array([-0.5] * 18), maxval=jp.array([0.5] * 18))
-
-obs, rewards, dones, infos = env.step(actions=actions)
-time_after_first_action = time.time()
-print(f'time to jit: {(time_after_first_action - time_after_reset) / 60.}')
-print(obs.shape, env.num_steps, dones, '\n------------------------------------------------------')
-print(env.current_mjx_datas.qpos.shape, '\n***************************************************')
-
-for i in range(5):
+for i in range(3 * 375):
     time_before_action = time.time()
-    actions = jax.random.uniform(key=jax.random.PRNGKey(31), shape=(num_envs, 18,),
+    actions = jax.random.uniform(key=jax.random.PRNGKey(i), shape=(num_envs, 18,),
                                  minval=jp.array([-0.5] * 18), maxval=jp.array([0.5] * 18))
 
     obs, rewards, dones, infos = env.step(actions=actions)
+    rollout.append(env.render())
     time_after_action = time.time()
-    print(f'time to step: {time_after_action - time_before_action}')
-    print(obs.shape, env.num_steps, dones, '\n------------------------------------------------------')
-    print(env.current_mjx_datas.qpos.shape, '\n***************************************************')
+    print(f'time to step and render: {time_after_action - time_before_action}')
+    # print(obs.shape, env.num_steps, dones, '\n------------------------------------------------------')
+    # print(env.current_mjx_datas.qpos.shape, '\n***************************************************')
 
-# jit_reset = jax.jit(env.reset)
-# jit_step = jax.jit(env.step)
-# state = env.reset(jax.random.PRNGKey(0))
-#
-# # state = jit_reset(jax.random.PRNGKey(0))
-# rollout = [state.pipeline_state]
-#
-# # grab a trajectory
-# for i in range(100):
-#   ctrl = -0.1 * jp.ones(env.sys.nu)
-#   state = env.step(state, ctrl)
-#   rollout.append(state.pipeline_state)
-#
-# clip = ImageSequenceClip(env.render(rollout, camera='hexapod_camera'), fps=1.0 / env.dt)
-# clip.write_videofile('test_brax.mp4', fps=1.0 / env.dt)
+
+
+clip = ImageSequenceClip(rollout, fps=1.0 / env.dt)
+clip.write_videofile('Test_Mujoco_VecEnv2.mp4', fps=1.0 / env.dt)
 
 
 
