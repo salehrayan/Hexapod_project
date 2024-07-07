@@ -26,10 +26,9 @@ class CPG():
         r0 = jp.zeros(num_joints)
         r_dot0 = jp.zeros(num_joints)  # Initial velocities set to zero
         theta0 = jp.zeros(num_joints)
-        self.initial_state = jp.vstack([r0, r_dot0, theta0])
+        self.initial_state = jp.zeros((3, num_joints))
 
-    @staticmethod
-    def cpg_dynamics(y, t, a, mu, omega):
+    def cpg_dynamics(self, y, t, a, mu, omega):
         r = y[0]
         r_dot = y[1]
         theta = y[3]
