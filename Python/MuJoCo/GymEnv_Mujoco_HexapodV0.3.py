@@ -255,42 +255,46 @@ vec_env = make_vec_env(create_hexapod_env, n_envs=num_envs)
 vec_env = VecNormalize(vec_env, norm_obs=False)
 vec_env = VecFrameStack(venv=vec_env, n_stack=nStacks)
 
-eval_vec_env = make_vec_env(create_hexapod_env, n_envs=2)
-eval_vec_env = VecNormalize(eval_vec_env, norm_reward=False, norm_obs=False)
+eval_vec_env = make_vec_env(create_hexapod_env, n_envs=1)
+# eval_vec_env = VecNormalize(eval_vec_env, norm_reward=False, norm_obs=False)
+eval_vec_env = VecNormalize.load(r'C:\Users\ASUS\Downloads\HexapodV0.3_PPO_mujoco_vel_angVel_continuity_vecnormalize_666664_steps.pkl', venv=eval_vec_env)
 eval_vec_env = VecFrameStack(venv=eval_vec_env, n_stack=nStacks)
 
-new_logger = configure(dir_path, ["csv", "tensorboard"])
-
-eval_callback = EvalCallback(eval_vec_env, best_model_save_path=dir_path,
-                             log_path=dir_path, eval_freq=int(500 / 3),
-                             deterministic=True, render=False)
-
-checkpoint_callback = CheckpointCallback(
-  save_freq=int(500 / 3),
-  save_path=dir_path,
-  name_prefix=dir_path.split('/')[-1],
-  save_vecnormalize=True,
-)
-recorder_callback = RenderAndRecordCallback(num_envs=num_envs, interval=400, record_duration=100, verbose=1, file_path=dir_path,
-                                            fps=1. / vec_env.get_attr('timePerControlStep', 0)[0])
-
-callback_list = CallbackList([eval_callback, checkpoint_callback, recorder_callback])
-
-model = PPO('MlpPolicy', vec_env, device='cpu', verbose=1)
-model.set_logger(new_logger)
-
-model.learn(total_timesteps=1100, progress_bar=True, callback=callback_list)
-
-
-# n_steps = 1000
-# _= eval_vec_env.reset()
-# rollout = []
+# new_logger = configure(dir_path, ["csv", "tensorboard"])
 #
-# for i in range(n_steps):
-#     action = np.random.uniform(size=(2,18,), low=-1, high=1)
-#     _ , _ ,_ ,_ = eval_vec_env.step(action)
-#     rollout.append(eval_vec_env.venv.venv.envs[0].render())
+# eval_callback = EvalCallback(eval_vec_env, best_model_save_path=dir_path,
+#                              log_path=dir_path, eval_freq=int(500 / 3),
+#                              deterministic=True, render=False)
 #
-# clip = ImageSequenceClip(rollout, fps=1.0 / eval_vec_env.get_attr('timePerControlStep', 0)[0])
-# clip.write_videofile('test_mujoco_stableBaselines.mp4',
-#                      fps=1.0 / eval_vec_env.get_attr('timePerControlStep', 0)[0])
+# checkpoint_callback = CheckpointCallback(
+#   save_freq=int(500 / 3),
+#   save_path=dir_path,
+#   name_prefix=dir_path.split('/')[-1],
+#   save_vecnormalize=True,
+# )
+# recorder_callback = RenderAndRecordCallback(num_envs=num_envs, interval=400, record_duration=100, verbose=1, file_path=dir_path,
+#                                             fps=1. / vec_env.get_attr('timePerControlStep', 0)[0])
+#
+# callback_list = CallbackList([eval_callback, checkpoint_callback, recorder_callback])
+
+# model = PPO('MlpPolicy', vec_env, device='cpu', verbose=1)
+model = PPO.load(r'C:\Users\ASUS\Downloads\HexapodV0.3_PPO_mujoco_vel_angVel_continuity_1333328_steps.zip')
+# model.set_logger(new_logger)
+
+# model.learn(total_timesteps=1100, progress_bar=True, callback=callback_list)
+
+
+n_steps = 1000
+obs= eval_vec_env.reset()
+rollout = []
+rewards= 0
+
+for i in range(n_steps):
+    action = model.predict(obs, deterministic=True)
+    obs , reward ,_ ,_ = eval_vec_env.step(action)
+    rewards += reward
+    rollout.append(eval_vec_env.venv.venv.envs[0].render())
+print(rewards)
+clip = ImageSequenceClip(rollout, fps=1.0 / eval_vec_env.get_attr('timePerControlStep', 0)[0])
+clip.write_videofile('test_mujoco_stableBaselines.mp4',
+                     fps=1.0 / eval_vec_env.get_attr('timePerControlStep', 0)[0])

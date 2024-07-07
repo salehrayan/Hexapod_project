@@ -43,7 +43,7 @@
 
     <body name="base" pos="0.0 0.0 0.23">
       <camera name="hexapod_camera" mode="track" pos="0.000 -1.414 1.414" xyaxes="1.000 -0.000 0.000 0.000 0.707 0.707"/>
-      <light name="top" pos="0 0 1"/>
+<!--      <light name="top" pos="0 0 1"/>-->
       <site name="siteBase" size="0.0001"/>
       <inertial pos="-1.2244e-08 1.2927e-08 -0.021795" quat="0.653281 0.270598 -0.653281 0.270598" mass="1.5" diaginertia="0.0042233 0.002302 0.002302"/>
       <freejoint  name="world_to_base"/>
