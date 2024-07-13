@@ -18,7 +18,6 @@ class CPG():
         # key = jax.random.PRNGKey(2)
         self.num_joints = num_joints
         self.a = 150
-        self.phases = np.random.uniform(size=(18,), low=0, high=2*np.pi)
         self.mu = jp.ones(num_joints)  # Make mu an array
         # self.mu = jax.random.uniform(shape=(num_joints, )) + 0.5  # Make mu an array
         self.omega = jp.ones(num_joints)  # Make omega an array
@@ -48,11 +47,10 @@ class CPG():
         theta = solution[:, 2, :]
         self.initial_state = jp.vstack((r[-1], r_dot[-1], theta[-1]))
 
-        positions = r * jp.cos(theta + self.phases)
+        positions = r * jp.cos(theta)
         return positions
 
 
-# os.environ['MUJOCO_GL'] = 'EGL'
 
 r = Rotation
 with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml', 'r') as f:
@@ -63,9 +61,6 @@ model = mujoco.MjModel.from_xml_string(xml)
 data = mujoco.MjData(model)
 mujoco.mj_forward(model, data)
 renderer = mujoco.Renderer(model, height=480, width=640)
-model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
-model.opt.iterations = 6
-model.opt.ls_iterations = 6
 
 scene_option = mujoco.MjvOption()
 scene_option.flags[mujoco.mjtVisFlag.mjVIS_JOINT] = True
@@ -81,18 +76,7 @@ for i in range(model.nsensor):
 duration = 4
 fps = 60
 cpg = CPG(num_joints=18)
-pso_result = jp.array([0.20180775,0.94669721,0.80685819,0.6836183,0.17228373,0.98244552
-,0.07630311,0.41196069,0.21599935,0.20170653,0.66577817,0.23975711
-,0.26602881,0.24020379,0.51151709,0.09169192,0.09437496,0.78306924
-,6.35548488,15.25872534,23.56954198,12.39094503,15.26652011,18.23101329
-,7.27622997,15.16929747,20.93045066,13.75301312,23.65212359,13.22857966
-,10.70333072,13.46150388,21.73960073,18.71507408,6.41447742,23.48534112
-,5.83394415,3.7318612,5.03570664,4.70759403,1.4075814,1.30649486
-,1.96576946,4.08141371,1.6336921,1.97162656,3.35136628,4.18156083
-,2.0786344,2.23744199,1.2327298,3.77084607,4.6211101,4.37957528])
-cpg.mu = pso_result[0:18]
-cpg.omega = pso_result[18:36]
-cpg.phases = pso_result[36:54]
+
 i=0
 # mujoco.viewer.launch(model, data)
 with  mujoco.viewer.launch_passive(model, data) as viewer:
@@ -108,19 +92,17 @@ with  mujoco.viewer.launch_passive(model, data) as viewer:
         #   b = r.from_euler('xyz', rollPitchYaw, degrees=False)
         #   c = p.getQuaternionFromEuler(rollPitchYaw)
         #   data.qpos[3:7] = np.roll(c, 1)
-        time_1 = time.time()
-        positions_times = cpg.get_position(10)
-        for positions in positions_times:
-            data.ctrl = positions
-            mujoco.mj_step(model, data)
-        time_2 = time.time()
-        while (time_2 - time_1) < (1./30.):
-            time_2 = time.time()
+        # positions_times = cpg.get_position(5)
+        # for positions in positions_times:
+        #     data.ctrl = positions
+        #     mujoco.mj_step(model, data)
 
           # mujoco.mj_forward(model, data)
         # data.ctrl = np.random.rand(model.nu) * 2 - 1
-        # print(data.sensordata[0])
-        # mujoco.mj_step(model, data)
+        mujoco.mj_step(model, data)
+        print(data.xanchor[:4])
+        print(data.site('siteFemur1Tibia1Touch'))
+        print('****************************************')
         # mujoco.mj_forward(model, data)
         # data.site_xpos[0] = np.array([0, 0, 0.4])
         # print(f'baseId : ', mujoco.mj_name2id(model, mujoco.mjtObj.mjOBJ_BODY, f'base'))
