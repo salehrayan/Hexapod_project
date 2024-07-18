@@ -7,6 +7,7 @@ import numpy as np
 import time
 import jax.numpy as jp
 import jax
+from brax.io import model
 from moviepy.editor import ImageSequenceClip
 from scipy.spatial.transform import Rotation
 from scipy.integrate import odeint
@@ -94,7 +95,7 @@ cpg.mu = pso_result[0:18]
 cpg.omega = pso_result[18:36]
 cpg.phases = pso_result[36:54]
 i=0
-# mujoco.viewer.launch(model, data)
+mujoco.viewer.launch(model, data)
 with  mujoco.viewer.launch_passive(model, data) as viewer:
     while viewer.is_running():
 
