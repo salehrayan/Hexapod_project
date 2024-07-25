@@ -3,6 +3,7 @@ import pybullet as p
 import os
 import mujoco
 import mujoco.viewer
+from mujoco import mjx
 import numpy as np
 import time
 import jax.numpy as jp
@@ -56,7 +57,7 @@ class CPG():
 # os.environ['MUJOCO_GL'] = 'EGL'
 
 r = Rotation
-with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml', 'r') as f:
+with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\V3_final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml', 'r') as f:
     xml = f.read()
 
 # Load the model
@@ -65,8 +66,12 @@ data = mujoco.MjData(model)
 mujoco.mj_forward(model, data)
 renderer = mujoco.Renderer(model, height=480, width=640)
 model.opt.solver = mujoco.mjtSolver.mjSOL_NEWTON
-model.opt.iterations = 6
-model.opt.ls_iterations = 6
+model.opt.iterations = 5
+model.opt.ls_iterations = 5
+model.pair_friction[:,:2] = 0.6
+# model.actuator_gainprm[:, 0] =  1.2 + model.actuator_gainprm[:, 0]
+# model.actuator_biasprm[:, 1]  = -1 * (1.2 + model.actuator_gainprm[:, 0])
+model_jx = mjx.put_model(model)
 
 scene_option = mujoco.MjvOption()
 scene_option.flags[mujoco.mjtVisFlag.mjVIS_JOINT] = True

@@ -1,0 +1,284 @@
+<mujoco model="Spider_Assembly_fineMesh_frictionDamp">
+  <default>
+    <geom contype="0" conaffinity="0"/>
+  </default>
+
+  <compiler angle="radian" meshdir="E:/github/Re-inforcement/Spider/Spider_Assembly_coarseMesh/meshes/"/>
+
+<!--  <visual>-->
+<!--    <headlight ambient="0.2 0.2 0.2" diffuse="0.3 0.7 0.7"/>-->
+<!--    <global offwidth="my_width"/>-->
+<!--  </visual>-->
+
+  <asset>
+    <mesh name="base" file="base.STL"/>
+    <mesh name="coxa1" file="coxa1.STL"/>
+    <mesh name="femur1" file="femur1.STL"/>
+    <mesh name="tibia1" file="tibia1.STL"/>
+    <mesh name="coxa2" file="coxa2.STL"/>
+    <mesh name="femur2" file="femur2.STL"/>
+    <mesh name="tibia2" file="tibia2.STL"/>
+    <mesh name="coxa3" file="coxa3.STL"/>
+    <mesh name="femur3" file="femur3.STL"/>
+    <mesh name="tibia3" file="tibia3.STL"/>
+    <mesh name="coxa4" file="coxa4.STL"/>
+    <mesh name="femur4" file="femur4.STL"/>
+    <mesh name="tibia4" file="tibia4.STL"/>
+    <mesh name="coxa5" file="coxa5.STL"/>
+    <mesh name="femur5" file="femur5.STL"/>
+    <mesh name="tibia5" file="tibia5.STL"/>
+    <mesh name="coxa6" file="coxa6.STL"/>
+    <mesh name="femur6" file="femur6.STL"/>
+    <mesh name="tibia6" file="tibia6.STL"/>
+
+    <texture name="grid" type="2d" builtin="checker" rgb1="0.1 0.2 0.3"
+        rgb2="0.4 0.5 0.6" width="300" height="300"/>
+
+    <material name="grid" texture="grid" texrepeat="3 3" reflectance="0.2"/>
+
+  </asset>
+
+  <worldbody>
+    <geom name="ground" type="plane" pos="0 0 0" size="0 0 0.1" material="grid" friction="0.9 0.005 0.0001" group="1"/>
+
+    <body name="base" pos="0.0 0.0 0.23">
+      <camera name="hexapod_camera" mode="track" pos="0.000 -1.414 1.414" xyaxes="1.000 -0.000 0.000 0.000 0.707 0.707"/>
+<!--      <light name="top" pos="0 0 1"/>-->
+      <site name="siteBase" size="0.0001"/>
+      <inertial pos="-1.2244e-08 1.2927e-08 -0.021795" quat="0.653281 0.270598 -0.653281 0.270598" mass="1.5" diaginertia="0.0042233 0.002302 0.002302"/>
+      <freejoint  name="world_to_base"/>
+<!--      <geom type="mesh"  group="1" density="0" rgba="1 0.67059 0 1" mesh="base"/>-->
+      <geom name="base" type="ellipsoid"  rgba="1 0.67059 0 1" mesh="base" group="3"/>
+      <geom name="baseSkin" type="mesh" rgba="1 0.67059 0 1" mesh="base" group="0"/>
+      <body name="coxa1" pos="0 0.1 -0.0229">
+
+        <inertial pos="0.00066313 0.03521 -0.033151" quat="0.591531 0.394571 -0.413055 0.569027" mass="0.18" diaginertia="0.000107664 9.55555e-05 4.14048e-05"/>
+        <joint name="base_to_coxa1" pos="0 0 0" axis="0 0 1" range="-1.0472 1.0472"  damping="0.15" />
+<!--        <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa1"/>-->
+        <geom type="capsule"  rgba="0.79216 0.81961 0.93333 1" mesh="coxa1" group="3"/>
+        <geom name="coxaSkin1" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="coxa1" group="0"/>
+        <body name="femur1" pos="0.00095743 0.076318 -0.055226" quat="0.00629629 0 0 0.99998">
+
+          <inertial pos="-0.0009176 -0.049861 -0.0049066" quat="0.492959 0.510166 -0.506858 0.489711" mass="0.07" diaginertia="0.000124482 8.65504e-05 4.82851e-05"/>
+          <joint name="coxa1_to_femur1" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+<!--          <geom type="mesh"  group="1" density="0" rgba="1 0.67059 0 1" mesh="femur1"/>-->
+          <geom name="femur1" type="sphere" rgba="1 0.67059 0 1" size="0.0355 0.03" pos="-0.0013  -0. -0." euler="0 1.57 0" group="3"/>
+          <geom name="femurSkin1" type="mesh" rgba="1 0.67059 0 1" mesh="femur1" group="0"/>
+          <body name="tibia1" pos="0 -0.099941 -0.0034349">
+
+            <inertial pos="0.00042461 -0.013369 -0.034865" quat="0.727077 -0.0391767 0.0534472 0.68335" mass="0.11" diaginertia="0.000151539 0.000145326 2.82495e-05"/>
+            <joint name="femur1_to_tibia1" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+            <site name="siteFemur1Tibia1"/>
+            <site name="siteFemur1Tibia1Touch" size="0.005" pos="0 -0.005 -0.14345021"/>
+<!--            <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="tibia1"/>-->
+            <geom name="tibia1" type="ellipsoid" size="0.012  0.0035 0.0045" rgba="0.79216 0.81961 0.93333 1" pos="-0.0015  -0.006 -0.1405" euler="0.2 -0.01 0" group="3"/>
+            <geom name="tibiaSkin1" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="tibia1" group="0"/>
+
+          </body>
+        </body>
+      </body>
+
+      <body name="coxa2" pos="-0.086603 0.050001 -0.0229">
+        <inertial pos="-0.029531 0.019185 -0.033151" quat="0.240999 0.545451 -0.169662 0.784613" mass="0.18" diaginertia="0.000107666 9.5557e-05 4.14042e-05"/>
+        <joint name="base_to_coxa2" pos="0 0 0" axis="0 0 1" range="-1.0472 1.0472"  damping="0.15" />
+<!--        <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa2"/>-->
+        <geom type="capsule"  rgba="0.79216 0.81961 0.93333 1" mesh="coxa2" group="3"/>
+        <geom name="coxaSkin2" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="coxa2" group="0"/>
+        <body name="femur2" pos="-0.064264 0.041176 -0.055226" quat="0.479861 0 0 -0.877345">
+
+          <inertial pos="-0.0009176 -0.049861 -0.0049067" quat="0.492958 0.510168 -0.506856 0.489712" mass="0.07" diaginertia="0.000124482 8.65504e-05 4.82851e-05"/>
+          <joint name="coxa2_to_femur2" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+<!--          <geom type="mesh"  group="1" density="0" rgba="1 0.67059 0 1" mesh="femur2"/>-->
+          <geom name="femur2" type="sphere" rgba="1 0.67059 0 1" size="0.0355 0.03" pos="-0.0013  -0. -0." euler="0 1.57 0" group="3"/>
+          <geom name="femurSkin2" type="mesh" rgba="1 0.67059 0 1" mesh="femur2" group="0"/>
+          <body name="tibia2" pos="0 -0.099941 -0.0034349">
+
+            <inertial pos="0.00042461 -0.013369 -0.034865" quat="0.727065 -0.0391687 0.0534469 0.683363" mass="0.11" diaginertia="0.000151549 0.000145326 2.82486e-05"/>
+            <joint name="femur2_to_tibia2" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+            <site name="siteFemur2Tibia2Touch" size="0.005" pos="0 -0.005 -0.14345021"/>
+<!--            <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="tibia2"/>-->
+            <geom name="tibia2" type="ellipsoid" size="0.012  0.0035 0.0045" rgba="0.79216 0.81961 0.93333 1" pos="-0.0015  -0.006 -0.1405" euler="0.2 -0.01 0" group="3"/>
+            <geom name="tibiaSkin2" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="tibia2" group="0"/>
+
+          </body>
+        </body>
+      </body>
+      <body name="coxa3" pos="-0.086604 -0.049999 -0.0229">
+        <inertial pos="-0.029972 -0.01849 -0.033151" quat="-0.216089 0.551586 0.148447 0.791847" mass="0.18" diaginertia="0.000107671 9.55622e-05 4.14059e-05"/>
+        <joint name="base_to_coxa3" pos="0 0 0" axis="0 0 1" range="-1.0472 1.0472"  damping="0.15" />
+<!--        <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa3"/>-->
+        <geom type="capsule"  rgba="0.79216 0.81961 0.93333 1" mesh="coxa3" group="3"/>
+        <geom name="coxaSkin3" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="coxa3" group="0"/>
+
+        <body name="femur3" pos="-0.064704 -0.04048 -0.055226" quat="0.874739 0 0 -0.484595">
+          <inertial pos="-0.00091762 -0.049861 -0.0049049" quat="0.49296 0.510167 -0.506856 0.489712" mass="0.07" diaginertia="0.000124482 8.65504e-05 4.82851e-05"/>
+          <joint name="coxa3_to_femur3" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+<!--          <geom type="mesh"  group="1" density="0" rgba="1 0.67059 0 1" mesh="femur3"/>-->
+          <geom name="femur3" type="sphere" rgba="1 0.67059 0 1" size="0.0355 0.03" pos="-0.0013  -0. -0." euler="0 1.57 0" group="3"/>
+          <geom name="femurSkin3" type="mesh" rgba="1 0.67059 0 1" mesh="femur3" group="0"/>
+
+          <body name="tibia3" pos="0 -0.099941 -0.0034349">
+            <inertial pos="0.0004246 -0.013369 -0.034865" quat="0.727074 -0.0391758 0.0534474 0.683354" mass="0.11" diaginertia="0.000151539 0.000145326 2.82485e-05"/>
+            <joint name="femur3_to_tibia3" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+            <site name="siteFemur3Tibia3Touch" size="0.005" pos="0 -0.005 -0.14345021"/>
+<!--            <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="tibia3"/>-->
+            <geom name="tibia3" type="ellipsoid" size="0.012  0.0035 0.0045" rgba="0.79216 0.81961 0.93333 1" pos="-0.0015  -0.006 -0.1405" euler="0.2 -0.01 0" group="3"/>
+            <geom name="tibiaSkin3" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="tibia3" group="0"/>
+
+          </body>
+        </body>
+      </body>
+      <body name="coxa4" pos="0 -0.1 -0.0229">
+        <inertial pos="0.00088599 -0.035205 -0.033151" quat="0.404256 0.581927 -0.578861 0.403557" mass="0.18" diaginertia="0.000107669 9.55609e-05 4.1406e-05"/>
+        <joint name="base_to_coxa4" pos="0 0 0" axis="0 0 1" range="-1.0472 1.0472"  damping="0.15" />
+<!--        <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa4"/>-->
+        <geom type="capsule"  rgba="0.79216 0.81961 0.93333 1" mesh="coxa4" group="3"/>
+        <geom name="coxaSkin4" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="coxa4" group="0"/>
+
+        <body name="femur4" pos="0.0024042 -0.076286 -0.055226">
+          <inertial pos="0.00065147 -0.049865 -0.0049066" quat="0.485184 0.518087 -0.498759 0.497415" mass="0.07" diaginertia="0.000124482 8.65506e-05 4.82849e-05"/>
+          <joint name="coxa4_to_femur4" pos="0 0 0" axis="0.999504 0.0315001 0" range="-1.0472 1.0472"  damping="0.15" />
+<!--          <geom type="mesh"  group="1" density="0" rgba="1 0.67059 0 1" mesh="femur4"/>-->
+          <geom name="femur4" type="sphere" rgba="1 0.67059 0 1" size="0.0355 0.03" pos="-0.0013  -0. -0." euler="0 1.57 0" group="3"/>
+          <geom name="femurSkin4" type="mesh" rgba="1 0.67059 0 1" mesh="femur4" group="0"/>
+
+          <body name="tibia4" pos="0.0031481 -0.099891 -0.0034349" quat="0.999876 0 0 0.0157518">
+            <inertial pos="0.00042261 -0.013369 -0.034865" quat="0.727078 -0.0391767 0.0534472 0.68335" mass="0.11" diaginertia="0.000151539 0.000145326 2.82495e-05"/>
+            <joint name="femur4_to_tibia4" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+            <site name="siteFemur4Tibia4Touch" size="0.005" pos="0 -0.005 -0.14345021"/>
+<!--            <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="tibia4"/>-->
+            <geom name="tibia4" type="ellipsoid" size="0.012  0.0035 0.0045" rgba="0.79216 0.81961 0.93333 1" pos="-0.0015  -0.006 -0.1405" euler="0.2 -0.01 0" group="3"/>
+            <geom name="tibiaSkin4" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="tibia4" group="0"/>
+
+          </body>
+        </body>
+      </body>
+      <body name="coxa5" pos="0.086601 -0.050001 -0.0229">
+
+        <inertial pos="0.030128 -0.018234 -0.033151" quat="0.160941 0.788351 -0.228485 0.548084" mass="0.18" diaginertia="0.000107666 9.55569e-05 4.14049e-05"/>
+        <joint name="base_to_coxa5" pos="0 0 0" axis="0 0 1" range="-1.0472 1.0472"  damping="0.15" />
+<!--        <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa5"/>-->
+        <geom type="capsule"  rgba="0.79216 0.81961 0.93333 1" mesh="coxa5" group="3"/>
+        <geom name="coxaSkin5" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="coxa5" group="0"/>
+
+        <body name="femur5" pos="0.065543 -0.039107 -0.055226" quat="0.869602 0 0 0.493753">
+          <inertial pos="-0.0009176 -0.049861 -0.0049067" quat="0.492958 0.510168 -0.506856 0.489712" mass="0.07" diaginertia="0.000124482 8.65504e-05 4.82851e-05"/>
+          <joint name="coxa5_to_femur5" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+<!--          <geom type="mesh"  group="1" density="0" rgba="1 0.67059 0 1" mesh="femur5"/>-->
+          <geom name="femur5"  type="sphere" rgba="1 0.67059 0 1" size="0.0355 0.03" pos="-0.0013  -0. -0." euler="0 1.57 0" group="3"/>
+          <geom name="femurSkin5" type="mesh" rgba="1 0.67059 0 1" mesh="femur5" group="0"/>
+
+          <body name="tibia5" pos="0 -0.099941 -0.0034349">
+            <inertial pos="0.00042461 -0.013369 -0.034865" quat="0.727065 -0.0391688 0.0534469 0.683363" mass="0.11" diaginertia="0.000151549 0.000145326 2.82486e-05"/>
+            <joint name="femur5_to_tibia5" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+            <site name="siteFemur5Tibia5Touch" size="0.005" pos="0 -0.005 -0.14345021"/>
+<!--            <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="tibia5"/>-->
+            <geom name="tibia5" type="ellipsoid" size="0.012  0.0035 0.0045" rgba="0.79216 0.81961 0.93333 1" pos="-0.0015  -0.006 -0.1405" euler="0.2 -0.01 0" group="3"/>
+            <geom name="tibiaSkin5" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="tibia5" group="0"/>
+
+          </body>
+        </body>
+      </body>
+      <body name="coxa6" pos="0.086602 0.049999 -0.0229">
+        <inertial pos="0.029393 0.019396 -0.033151" quat="-0.156852 0.788454 0.228154 0.549257" mass="0.18" diaginertia="0.000107671 9.5563e-05 4.14064e-05"/>
+        <joint name="base_to_coxa6" pos="0 0 0" axis="0 0 1" range="-1.0472 1.0472"  damping="0.15" />
+<!--        <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa6"/>-->
+        <geom type="capsule"  rgba="0.79216 0.81961 0.93333 1" mesh="coxa6" group="3"/>
+        <geom name="coxaSkin6" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="coxa6" group="0"/>
+
+        <body name="femur6" pos="0.063439 0.042436 -0.055226" quat="0.471152 0 0 0.882052">
+          <inertial pos="-0.00091762 -0.049861 -0.0049049" quat="0.49296 0.510167 -0.506856 0.489712" mass="0.07" diaginertia="0.000124482 8.65504e-05 4.82851e-05"/>
+          <joint name="coxa6_to_femur6" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+<!--          <geom type="mesh"  group="1" density="0" rgba="1 0.67059 0 1" mesh="femur6"/>-->
+          <geom name="femur6" type="sphere" rgba="1 0.67059 0 1" size="0.0355 0.03" pos="-0.0013  -0. -0." euler="0 1.57 0" group="3"/>
+          <geom name="femurSkin6" type="mesh" rgba="1 0.67059 0 1" mesh="femur6" group="0"/>
+
+          <body name="tibia6" pos="0 -0.099941 -0.0034349">
+            <inertial pos="0.0004246 -0.013369 -0.034865" quat="0.727074 -0.0391758 0.0534473 0.683354" mass="0.11" diaginertia="0.000151539 0.000145326 2.82485e-05"/>
+            <joint name="femur6_to_tibia6" pos="0 0 0" axis="1 0 0" range="-1.0472 1.0472"  damping="0.15" />
+            <site name="siteFemur6Tibia6Touch" size="0.005" pos="0 -0.005 -0.14345021"/>
+<!--            <geom type="mesh"  group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="tibia6"/>-->
+            <geom name="tibia6" type="ellipsoid" size="0.012  0.0035 0.0045" rgba="0.79216 0.81961 0.93333 1" pos="-0.0015  -0.006 -0.1405" euler="0.2 -0.01 0" group="3"/>
+            <geom name="tibiaSkin6" type="mesh" rgba="0.79216 0.81961 0.93333 1" mesh="tibia6" group="0"/>
+
+          </body>
+        </body>
+      </body>
+    </body>
+  </worldbody>
+
+  <actuator>
+    <position name="motor_base_to_coxa1" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="base_to_coxa1" kp="10" kv="0.1"/>
+    <position name="motor_coxa1_to_femur1" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="coxa1_to_femur1" kp="10" kv="0.1"/>
+    <position name="motor_femur1_to_tibia1" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="femur1_to_tibia1" kp="10" kv="0.1"/>
+
+    <position name="motor_base_to_coxa2" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="base_to_coxa2" kp="10" kv="0.1"/>
+    <position name="motor_coxa2_to_femur2" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="coxa2_to_femur2" kp="10" kv="0.1"/>
+    <position name="motor_femur2_to_tibia2" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="femur2_to_tibia2" kp="10" kv="0.1"/>
+
+    <position name="motor_base_to_coxa3" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="base_to_coxa3" kp="10" kv="0.1"/>
+    <position name="motor_coxa3_to_femur3" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="coxa3_to_femur3" kp="10" kv="0.1"/>
+    <position name="motor_femur3_to_tibia3" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="femur3_to_tibia3" kp="10" kv="0.1"/>
+
+    <position name="motor_base_to_coxa4" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="base_to_coxa4" kp="10" kv="0.1"/>
+    <position name="motor_coxa4_to_femur4" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="coxa4_to_femur4" kp="10" kv="0.1"/>
+    <position name="motor_femur4_to_tibia4" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="femur4_to_tibia4" kp="10" kv="0.1"/>
+
+    <position name="motor_base_to_coxa5" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="base_to_coxa5" kp="10" kv="0.1"/>
+    <position name="motor_coxa5_to_femur5" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="coxa5_to_femur5" kp="10" kv="0.1"/>
+    <position name="motor_femur5_to_tibia5" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="femur5_to_tibia5" kp="10" kv="0.1"/>
+
+    <position name="motor_base_to_coxa6" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="base_to_coxa6" kp="10" kv="0.1"/>
+    <position name="motor_coxa6_to_femur6" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="coxa6_to_femur6" kp="10" kv="0.1"/>
+    <position name="motor_femur6_to_tibia6" forcelimited="true" forcerange="-1.1 1.1" ctrllimited="true" ctrlrange="-1.0472 1.0472" joint="femur6_to_tibia6" kp="10" kv="0.1"/>
+
+  </actuator>
+
+  <contact>
+    <pair geom1="ground" geom2="tibia1"/>
+    <pair geom1="ground" geom2="tibia2"/>
+    <pair geom1="ground" geom2="tibia3"/>
+    <pair geom1="ground" geom2="tibia4"/>
+    <pair geom1="ground" geom2="tibia5"/>
+    <pair geom1="ground" geom2="tibia6"/>
+<!--    <pair geom1="ground" geom2="base"/>-->
+
+    <pair geom1="femur1" geom2="femur2"/>
+    <pair geom1="femur1" geom2="femur6"/>
+    <pair geom1="femur3" geom2="femur2"/>
+    <pair geom1="femur3" geom2="femur4"/>
+    <pair geom1="femur5" geom2="femur6"/>
+    <pair geom1="femur5" geom2="femur4"/>
+
+  </contact>
+
+  <sensor>
+<!--    <actuatorfrc name="torqueSensorBaseCoxa1" actuator="motor_base_to_coxa1"/>-->
+
+    <touch name="touchSensorTibia1" site="siteFemur1Tibia1Touch"/>
+    <touch name="touchSensorTibia2" site="siteFemur2Tibia2Touch"/>
+    <touch name="touchSensorTibia3" site="siteFemur3Tibia3Touch"/>
+    <touch name="touchSensorTibia4" site="siteFemur4Tibia4Touch"/>
+    <touch name="touchSensorTibia5" site="siteFemur5Tibia5Touch"/>
+    <touch name="touchSensorTibia6" site="siteFemur6Tibia6Touch"/>
+
+    <fromto name="contactLocationTibia1" body1="tibia1" geom2="ground" cutoff="0.001"/>
+    <fromto name="contactLocationTibia2" body1="tibia2" geom2="ground" cutoff="0.001"/>
+    <fromto name="contactLocationTibia3" body1="tibia3" geom2="ground" cutoff="0.001"/>
+    <fromto name="contactLocationTibia4" body1="tibia4" geom2="ground" cutoff="0.001"/>
+    <fromto name="contactLocationTibia5" body1="tibia5" geom2="ground" cutoff="0.001"/>
+    <fromto name="contactLocationTibia6" body1="tibia6" geom2="ground" cutoff="0.001"/>
+
+    <fromto name="collisionFemur1To2" body1="femur1" body2="femur2" cutoff="0.015"/>
+    <fromto name="collisionFemur1To6" body1="femur1" body2="femur6" cutoff="0.015"/>
+    <fromto name="collisionFemur3To2" body1="femur3" body2="femur2" cutoff="0.015"/>
+    <fromto name="collisionFemur3To4" body1="femur3" body2="femur4" cutoff="0.015"/>
+    <fromto name="collisionFemur5To6" body1="femur5" body2="femur6" cutoff="0.015"/>
+    <fromto name="collisionFemur5To4" body1="femur5" body2="femur4" cutoff="0.015"/>
+
+    <velocimeter name="baseVelocity" site="siteBase"/>
+    <gyro name="baseGyro" site="siteBase"/>
+
+  </sensor>
+
+</mujoco>
