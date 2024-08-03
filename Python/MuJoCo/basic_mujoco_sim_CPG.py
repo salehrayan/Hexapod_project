@@ -57,7 +57,7 @@ class CPG():
 # os.environ['MUJOCO_GL'] = 'EGL'
 
 r = Rotation
-with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\V3_final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml', 'r') as f:
+with open(r'E:\github\Re-inforcement\Spider\Spider_Assembly_fineMesh_frictionDamp\urdf\V4_final_noFrictionLoss_noCoxaCon_explicitConPair_ellipsoidTibias.xml', 'r') as f:
     xml = f.read()
 
 # Load the model
