@@ -13,4 +13,4 @@ Some deep reinforcement learning experiments using: Pybullet + Stablebaselines3 
 
 Handmade IK tripod gait in the real world:
 
-![vid1.mp4](https://github.com/salehrayan/Hexapod_project/blob/main/vid1.mp4)
+https://github.com/salehrayan/Hexapod_project/blob/main/vid1.mp4
