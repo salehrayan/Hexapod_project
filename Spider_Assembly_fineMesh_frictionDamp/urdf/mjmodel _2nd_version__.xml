@@ -39,14 +39,14 @@
   <worldbody>
     <geom name="ground" type="plane" pos="0 0 0" size="0 0 0.1" material="grid" friction="0.9 0.005 0.0001"/>
 
-    <body name="base" pos="0.0 0.0 0.23">
+    <body name="base" pos="0.0 0.0 0.33">
       <camera name="hexapod_camera" mode="track" pos="-0.008 -0.950 1.019" xyaxes="1.000 -0.000 0.000 0.000 0.707 0.707"/>
       <site name="siteBase" size="0.0001"/>
       <inertial pos="-1.2244e-08 1.2927e-08 -0.021795" quat="0.653281 0.270598 -0.653281 0.270598" mass="1.5" diaginertia="0.0042233 0.002302 0.002302"/>
       <joint name="root_to_base" type="free" limited="false" actuatorfrclimited="false"/>
 <!--      <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="1 0.67059 0 1" mesh="base"/>-->
       <geom type="mesh" friction="0.9" rgba="1 0.67059 0 1" mesh="base"/>
-      <body name="coxa1" pos="0 0.1 -0.0229">
+      <body name="coxa1" pos="0 0.1 -0.0229" euler="0 0 0.01255">
 
         <inertial pos="0.00066313 0.03521 -0.033151" quat="0.591531 0.394571 -0.413055 0.569027" mass="0.18" diaginertia="0.000107664 9.55555e-05 4.14048e-05"/>
         <joint name="base_to_coxa1" pos="0 0 0" axis="0 0 1" damping="0.0" armature="0.0" />
@@ -73,7 +73,7 @@
         </body>
       </body>
 
-      <body name="coxa2" pos="-0.086603 0.050001 -0.0229">
+      <body name="coxa2" pos="-0.086603 0.050001 -0.0229" euler="0 0 0.04625">
         <inertial pos="-0.029531 0.019185 -0.033151" quat="0.240999 0.545451 -0.169662 0.784613" mass="0.18" diaginertia="0.000107666 9.5557e-05 4.14042e-05"/>
         <joint name="base_to_coxa2" pos="0 0 0" axis="0 0 1" damping="0.0" armature="0.0" />
 <!--        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa2"/>-->
@@ -95,7 +95,7 @@
           </body>
         </body>
       </body>
-      <body name="coxa3" pos="-0.086604 -0.049999 -0.0229">
+      <body name="coxa3" pos="-0.086604 -0.049999 -0.0229" euler="0 0 -0.03545">
         <inertial pos="-0.029972 -0.01849 -0.033151" quat="-0.216089 0.551586 0.148447 0.791847" mass="0.18" diaginertia="0.000107671 9.55622e-05 4.14059e-05"/>
         <joint name="base_to_coxa3" pos="0 0 0" axis="0 0 1" damping="0.0" armature="0.0" />
 <!--        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa3"/>-->
@@ -117,7 +117,7 @@
           </body>
         </body>
       </body>
-      <body name="coxa4" pos="0 -0.1 -0.0229">
+      <body name="coxa4" pos="0 -0.1 -0.0229" euler="0 0 -0.031525">
         <inertial pos="0.00088599 -0.035205 -0.033151" quat="0.404256 0.581927 -0.578861 0.403557" mass="0.18" diaginertia="0.000107669 9.55609e-05 4.1406e-05"/>
         <joint name="base_to_coxa4" pos="0 0 0" axis="0 0 1" damping="0.0" armature="0.0" />
 <!--        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa4"/>-->
@@ -139,7 +139,7 @@
           </body>
         </body>
       </body>
-      <body name="coxa5" pos="0.086601 -0.050001 -0.0229">
+      <body name="coxa5" pos="0.086601 -0.050001 -0.0229" euler="0 0 0.01437">
 
         <inertial pos="0.030128 -0.018234 -0.033151" quat="0.160941 0.788351 -0.228485 0.548084" mass="0.18" diaginertia="0.000107666 9.55569e-05 4.14049e-05"/>
         <joint name="base_to_coxa5" pos="0 0 0" axis="0 0 1" damping="0.0" armature="0.0" />
@@ -162,7 +162,7 @@
           </body>
         </body>
       </body>
-      <body name="coxa6" pos="0.086602 0.049999 -0.0229">
+      <body name="coxa6" pos="0.086602 0.049999 -0.0229" euler="0 0 -0.06595">
         <inertial pos="0.029393 0.019396 -0.033151" quat="-0.156852 0.788454 0.228154 0.549257" mass="0.18" diaginertia="0.000107671 9.5563e-05 4.14064e-05"/>
         <joint name="base_to_coxa6" pos="0 0 0" axis="0 0 1" damping="0.0" armature="0.0" />
 <!--        <geom type="mesh" contype="0" conaffinity="0" group="1" density="0" rgba="0.79216 0.81961 0.93333 1" mesh="coxa6"/>-->
