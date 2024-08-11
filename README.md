@@ -7,5 +7,4 @@ Solidworks designing:
 
 
 Some deep reinforcement learning experiments using: Pybullet + Stablebaselines3 / Mujoco Jax + Google Brax
-![pybullet.gif](https://github.com/salehrayan/Hexapod_project/blob/main/pybullet.gif)
-![mujoco.gif](https://github.com/salehrayan/Hexapod_project/blob/main/mujoco.gif)
+![pybullet.gif](https://github.com/salehrayan/Hexapod_project/blob/main/pybullet.gif) ![mujoco.gif](https://github.com/salehrayan/Hexapod_project/blob/main/mujoco.gif)
