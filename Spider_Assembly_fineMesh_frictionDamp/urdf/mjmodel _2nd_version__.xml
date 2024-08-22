@@ -39,7 +39,7 @@
   <worldbody>
     <geom name="ground" type="plane" pos="0 0 0" size="0 0 0.1" material="grid" friction="0.9 0.005 0.0001"/>
 
-    <body name="base" pos="0.0 0.0 0.33">
+    <body name="base" pos="0.0 0.0 0.23">
       <camera name="hexapod_camera" mode="track" pos="-0.008 -0.950 1.019" xyaxes="1.000 -0.000 0.000 0.000 0.707 0.707"/>
       <site name="siteBase" size="0.0001"/>
       <inertial pos="-1.2244e-08 1.2927e-08 -0.021795" quat="0.653281 0.270598 -0.653281 0.270598" mass="1.5" diaginertia="0.0042233 0.002302 0.002302"/>
