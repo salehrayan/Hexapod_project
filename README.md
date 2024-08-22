@@ -18,3 +18,7 @@ Handmade IK tripod gait in the real world:
 
 https://github.com/user-attachments/assets/f220c311-86f7-40fb-8360-4a4d27c98b55
 
+
+
+https://github.com/user-attachments/assets/fa36412a-cb3a-4d34-bd70-effb0d1cd076
+
