@@ -6,7 +6,8 @@ Solidworks designing:
 ![solid.jpg](https://github.com/salehrayan/Hexapod_project/blob/main/solid.jpg)
 
 
-Some deep reinforcement learning experiments using: Pybullet + Stablebaselines3 / Mujoco Jax + Google Brax
+Some deep reinforcement learning experiments using: Pybullet + Stablebaselines3 / Mujoco Jax + Google Brax.
+
 Mujoco Jax allows Massively Parallel Reinforcement Learning using GPUs across thousands of environments. Very useful.
 
 ![pybullet2.gif](https://github.com/salehrayan/Hexapod_project/blob/main/pybullet2.gif) 
